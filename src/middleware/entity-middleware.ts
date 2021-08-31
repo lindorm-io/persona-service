@@ -1,7 +1,14 @@
-import { DisplayName, Identity } from "../entity";
-import { DisplayNameRepository, IdentityRepository } from "../infrastructure";
+import { ConnectSession, Identity } from "../entity";
+import { ConnectSessionCache, IdentityRepository } from "../infrastructure";
 import { repositoryEntityMiddleware } from "@lindorm-io/koa-mongo";
+import { cacheEntityMiddleware } from "@lindorm-io/koa-redis";
 
-export const displayNameEntityMiddleware = repositoryEntityMiddleware(DisplayName, DisplayNameRepository);
+export const connectSessionEntityMiddleware = cacheEntityMiddleware(
+  ConnectSession,
+  ConnectSessionCache,
+);
 
-export const identityEntityMiddleware = repositoryEntityMiddleware(Identity, IdentityRepository);
+export const identityEntityMiddleware = repositoryEntityMiddleware(
+  Identity,
+  IdentityRepository,
+);
