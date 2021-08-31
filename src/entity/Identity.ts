@@ -1,13 +1,21 @@
 import Joi from "joi";
-import { DisplayNameEvent, IdentityEvent } from "../enum";
+import { IdentityEvent, NamingSystem } from "../enum";
 import { IdentityAddress } from "../typing";
-import { JOI_IDENTITY_ADDRESS, JOI_IDENTITY_DISPLAY_NAME } from "../constant";
+import {
+  JOI_BIRTHDATE,
+  JOI_IDENTITY_ADDRESS,
+  JOI_IDENTITY_DISPLAY_NAME,
+  JOI_LOCALE,
+  JOI_NAMING_SYSTEM,
+  JOI_ZONE_INFO,
+} from "../constant";
 import {
   EntityAttributes,
   EntityCreationError,
-  EntityOptions,
+  EntityKeys,
   JOI_ENTITY_BASE,
   LindormEntity,
+  Optional,
 } from "@lindorm-io/entity";
 
 export interface IdentityDisplayName {
@@ -25,56 +33,67 @@ export interface IdentityAttributes extends EntityAttributes {
   gravatar: string;
   locale: string;
   middleName: string;
+  namingSystem: string;
   nickname: string;
-  phoneNumber: string;
-  phoneNumberVerified: boolean;
   picture: string;
+  preferredAccessibility: Array<string>;
   preferredUsername: string;
   profile: string;
+  pronouns: string;
+  socialSecurityNumber: string;
+  username: string;
   website: string;
   zoneInfo: string;
 }
 
-export interface IdentityOptions extends EntityOptions {
-  address?: IdentityAddress;
-  birthDate?: string;
-  displayName?: IdentityDisplayName;
-  familyName?: string;
-  gender?: string;
-  givenName?: string;
-  gravatar?: string;
-  locale?: string;
-  middleName?: string;
-  nickname?: string;
-  phoneNumber?: string;
-  phoneNumberVerified?: boolean;
-  picture?: string;
-  preferredUsername?: string;
-  profile?: string;
-  website?: string;
-  zoneInfo?: string;
-}
+export type IdentityOptions = Optional<
+  IdentityAttributes,
+  | EntityKeys
+  | "address"
+  | "birthDate"
+  | "displayName"
+  | "familyName"
+  | "gender"
+  | "givenName"
+  | "gravatar"
+  | "locale"
+  | "middleName"
+  | "namingSystem"
+  | "nickname"
+  | "picture"
+  | "preferredAccessibility"
+  | "preferredUsername"
+  | "profile"
+  | "pronouns"
+  | "socialSecurityNumber"
+  | "username"
+  | "website"
+  | "zoneInfo"
+>;
 
-const schema = Joi.object({
+const schema = Joi.object<IdentityAttributes>({
   ...JOI_ENTITY_BASE,
 
   address: JOI_IDENTITY_ADDRESS.required(),
-  birthDate: Joi.string().allow(null).required(),
+  birthDate: JOI_BIRTHDATE.allow(null).required(),
   displayName: JOI_IDENTITY_DISPLAY_NAME.required(),
   familyName: Joi.string().allow(null).required(),
   gender: Joi.string().allow(null).required(),
   givenName: Joi.string().allow(null).required(),
-  gravatar: Joi.string().allow(null).required(),
-  locale: Joi.string().allow(null).required(),
+  gravatar: Joi.string().uri().allow(null).required(),
+  locale: JOI_LOCALE.allow(null).required(),
   middleName: Joi.string().allow(null).required(),
+  namingSystem: JOI_NAMING_SYSTEM.required(),
   nickname: Joi.string().allow(null).required(),
-  phoneNumber: Joi.string().allow(null).required(),
-  phoneNumberVerified: Joi.boolean().required(),
-  picture: Joi.string().allow(null).required(),
+  picture: Joi.string().uri().allow(null).required(),
+  preferredAccessibility: Joi.array().items(Joi.string()).required(),
   preferredUsername: Joi.string().allow(null).required(),
-  profile: Joi.string().allow(null).required(),
-  website: Joi.string().allow(null).required(),
-  zoneInfo: Joi.string().allow(null).required(),
+  profile: Joi.string().uri().allow(null).required(),
+  pronouns: Joi.string().allow(null).required(),
+  socialSecurityNumber: Joi.string().allow(null).required(),
+  username: Joi.string().lowercase().allow(null).required(),
+  website: Joi.string().uri().allow(null).required(),
+  zoneInfo: JOI_ZONE_INFO.allow(null).required(),
 });
 
 export class Identity extends LindormEntity<IdentityAttributes> {
@@ -87,12 +106,15 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   private _gravatar: string;
   private _locale: string;
   private _middleName: string;
+  private _namingSystem: string;
   private _nickname: string;
-  private _phoneNumber: string;
-  private _phoneNumberVerified: boolean;
   private _picture: string;
+  private _preferredAccessibility: Array<string>;
   private _preferredUsername: string;
   private _profile: string;
+  private _pronouns: string;
+  private _socialSecurityNumber: string;
+  private _username: string;
   private _website: string;
   private _zoneInfo: string;
 
@@ -117,12 +139,15 @@ export class Identity extends LindormEntity<IdentityAttributes> {
     this._gravatar = options.gravatar || null;
     this._locale = options.locale || null;
     this._middleName = options.middleName || null;
+    this._namingSystem = options.namingSystem || NamingSystem.GIVEN_FAMILY;
     this._nickname = options.nickname || null;
-    this._phoneNumber = options.phoneNumber || null;
-    this._phoneNumberVerified = options.phoneNumberVerified === true;
     this._picture = options.picture || null;
+    this._preferredAccessibility = options.preferredAccessibility || [];
     this._preferredUsername = options.preferredUsername || null;
     this._profile = options.profile || null;
+    this._pronouns = options.pronouns || null;
+    this._socialSecurityNumber = options.socialSecurityNumber || null;
+    this._username = options.username || null;
     this._website = options.website || null;
     this._zoneInfo = options.zoneInfo || null;
   }
@@ -132,7 +157,7 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   }
   public set address(address: IdentityAddress) {
     this._address = address;
-    this.addEvent(IdentityEvent.ADDRESS_CHANGED, { address: this._address });
+    this.addEvent(IdentityEvent.ADDRESS_CHANGED, { address });
   }
 
   public get birthDate(): string {
@@ -140,7 +165,7 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   }
   public set birthDate(birthDate: string) {
     this._birthDate = birthDate;
-    this.addEvent(IdentityEvent.BIRTH_DATE_CHANGED, { birthDate: this._birthDate });
+    this.addEvent(IdentityEvent.BIRTH_DATE_CHANGED, { birthDate });
   }
 
   public get displayName(): IdentityDisplayName {
@@ -148,7 +173,7 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   }
   public set displayName(displayName: IdentityDisplayName) {
     this._displayName = displayName;
-    this.addEvent(IdentityEvent.DISPLAY_NAME_CHANGED, { displayName: this._displayName });
+    this.addEvent(IdentityEvent.DISPLAY_NAME_CHANGED, { displayName });
   }
 
   public get familyName(): string {
@@ -156,7 +181,7 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   }
   public set familyName(familyName: string) {
     this._familyName = familyName;
-    this.addEvent(IdentityEvent.FAMILY_NAME_CHANGED, { familyName: this._familyName });
+    this.addEvent(IdentityEvent.FAMILY_NAME_CHANGED, { familyName });
   }
 
   public get gender(): string {
@@ -164,7 +189,7 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   }
   public set gender(gender: string) {
     this._gender = gender;
-    this.addEvent(IdentityEvent.GENDER_CHANGED, { gender: this._gender });
+    this.addEvent(IdentityEvent.GENDER_CHANGED, { gender });
   }
 
   public get givenName(): string {
@@ -172,7 +197,7 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   }
   public set givenName(givenName: string) {
     this._givenName = givenName;
-    this.addEvent(IdentityEvent.GIVEN_NAME_CHANGED, { givenName: this._givenName });
+    this.addEvent(IdentityEvent.GIVEN_NAME_CHANGED, { givenName });
   }
 
   public get gravatar(): string {
@@ -180,7 +205,7 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   }
   public set gravatar(gravatar: string) {
     this._gravatar = gravatar;
-    this.addEvent(IdentityEvent.GRAVATAR_CHANGED, { gravatar: this._givenName });
+    this.addEvent(IdentityEvent.GRAVATAR_CHANGED, { gravatar });
   }
 
   public get locale(): string {
@@ -188,7 +213,7 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   }
   public set locale(locale: string) {
     this._locale = locale;
-    this.addEvent(IdentityEvent.LOCALE_CHANGED, { locale: this._locale });
+    this.addEvent(IdentityEvent.LOCALE_CHANGED, { locale });
   }
 
   public get middleName(): string {
@@ -196,7 +221,15 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   }
   public set middleName(middleName: string) {
     this._middleName = middleName;
-    this.addEvent(IdentityEvent.MIDDLE_NAME_CHANGED, { middleName: this._middleName });
+    this.addEvent(IdentityEvent.MIDDLE_NAME_CHANGED, { middleName });
+  }
+
+  public get namingSystem(): string {
+    return this._namingSystem;
+  }
+  public set namingSystem(namingSystem: string) {
+    this._namingSystem = namingSystem;
+    this.addEvent(IdentityEvent.NAMING_SYSTEM_CHANGED, { namingSystem });
   }
 
   public get nickname(): string {
@@ -204,23 +237,7 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   }
   public set nickname(nickname: string) {
     this._nickname = nickname;
-    this.addEvent(IdentityEvent.NICKNAME_CHANGED, { nickname: this._nickname });
-  }
-
-  public get phoneNumber(): string {
-    return this._phoneNumber;
-  }
-  public set phoneNumber(phoneNumber: string) {
-    this._phoneNumber = phoneNumber;
-    this.addEvent(IdentityEvent.PHONE_NUMBER_CHANGED, { phoneNumber: this._phoneNumber });
-  }
-
-  public get phoneNumberVerified(): boolean {
-    return this._phoneNumberVerified;
-  }
-  public set phoneNumberVerified(phoneNumberVerified: boolean) {
-    this._phoneNumberVerified = phoneNumberVerified;
-    this.addEvent(IdentityEvent.PHONE_NUMBER_VERIFIED_CHANGED, { phoneNumberVerified: this._phoneNumber });
+    this.addEvent(IdentityEvent.NICKNAME_CHANGED, { nickname });
   }
 
   public get picture(): string {
@@ -228,7 +245,17 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   }
   public set picture(picture: string) {
     this._picture = picture;
-    this.addEvent(IdentityEvent.PICTURE_CHANGED, { picture: this._picture });
+    this.addEvent(IdentityEvent.PICTURE_CHANGED, { picture });
+  }
+
+  public get preferredAccessibility(): Array<string> {
+    return this._preferredAccessibility;
+  }
+  public set preferredAccessibility(preferredAccessibility: Array<string>) {
+    this._preferredAccessibility = preferredAccessibility;
+    this.addEvent(IdentityEvent.PREFERRED_ACCESSIBILITY_CHANGED, {
+      preferredAccessibility,
+    });
   }
 
   public get preferredUsername(): string {
@@ -236,7 +263,7 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   }
   public set preferredUsername(preferredUsername: string) {
     this._preferredUsername = preferredUsername;
-    this.addEvent(IdentityEvent.PREFERRED_USERNAME_CHANGED, { preferredUsername: this._preferredUsername });
+    this.addEvent(IdentityEvent.PREFERRED_USERNAME_CHANGED, { preferredUsername });
   }
 
   public get profile(): string {
@@ -244,7 +271,31 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   }
   public set profile(profile: string) {
     this._profile = profile;
-    this.addEvent(IdentityEvent.PROFILE_CHANGED, { profile: this._profile });
+    this.addEvent(IdentityEvent.PROFILE_CHANGED, { profile });
+  }
+
+  public get pronouns(): string {
+    return this._pronouns;
+  }
+  public set pronouns(pronouns: string) {
+    this._pronouns = pronouns;
+    this.addEvent(IdentityEvent.PRONOUNS_CHANGED, { pronouns });
+  }
+
+  public get socialSecurityNumber(): string {
+    return this._socialSecurityNumber;
+  }
+  public set socialSecurityNumber(socialSecurityNumber: string) {
+    this._socialSecurityNumber = socialSecurityNumber;
+    this.addEvent(IdentityEvent.SOCIAL_SECURITY_NUMBER_CHANGED, { socialSecurityNumber });
+  }
+
+  public get username(): string {
+    return this._username;
+  }
+  public set username(username: string) {
+    this._username = username;
+    this.addEvent(IdentityEvent.USERNAME_CHANGED, { username });
   }
 
   public get website(): string {
@@ -252,7 +303,7 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   }
   public set website(website: string) {
     this._website = website;
-    this.addEvent(IdentityEvent.WEBSITE_CHANGED, { website: this._website });
+    this.addEvent(IdentityEvent.WEBSITE_CHANGED, { website });
   }
 
   public get zoneInfo(): string {
@@ -260,7 +311,7 @@ export class Identity extends LindormEntity<IdentityAttributes> {
   }
   public set zoneInfo(zoneInfo: string) {
     this._zoneInfo = zoneInfo;
-    this.addEvent(IdentityEvent.ZONE_INFO_CHANGED, { zoneInfo: this._zoneInfo });
+    this.addEvent(IdentityEvent.ZONE_INFO_CHANGED, { zoneInfo });
   }
 
   public create(): void {
@@ -270,11 +321,7 @@ export class Identity extends LindormEntity<IdentityAttributes> {
     }
 
     const { events, ...rest } = this.toJSON();
-    this.addEvent(DisplayNameEvent.CREATED, rest);
-  }
-
-  public getKey(): string {
-    return this.id;
+    this.addEvent(IdentityEvent.CREATED, rest);
   }
 
   public async schemaValidation(): Promise<void> {
@@ -294,12 +341,15 @@ export class Identity extends LindormEntity<IdentityAttributes> {
       gravatar: this.gravatar,
       locale: this.locale,
       middleName: this.middleName,
+      namingSystem: this.namingSystem,
       nickname: this.nickname,
-      phoneNumber: this.phoneNumber,
-      phoneNumberVerified: this.phoneNumberVerified,
       picture: this.picture,
+      preferredAccessibility: this.preferredAccessibility,
       preferredUsername: this.preferredUsername,
       profile: this.profile,
+      pronouns: this.pronouns,
+      socialSecurityNumber: this.socialSecurityNumber,
+      username: this.username,
       website: this.website,
       zoneInfo: this.zoneInfo,
     };

@@ -1,13 +1,13 @@
 import Joi from "joi";
-import { DisplayNameEvent } from "../enum";
 import { LindormError } from "@lindorm-io/errors";
+import { getRandomNumber } from "@lindorm-io/core";
 import { includes, remove } from "lodash";
 import {
   EntityAttributes,
-  EntityCreationError,
-  EntityOptions,
+  EntityKeys,
   JOI_ENTITY_BASE,
   LindormEntity,
+  Optional,
 } from "@lindorm-io/entity";
 
 export interface DisplayNameAttributes extends EntityAttributes {
@@ -15,12 +15,9 @@ export interface DisplayNameAttributes extends EntityAttributes {
   numbers: Array<number>;
 }
 
-export interface DisplayNameOptions extends EntityOptions {
-  name: string;
-  numbers?: Array<number>;
-}
+export type DisplayNameOptions = Optional<DisplayNameAttributes, EntityKeys | "numbers">;
 
-const schema = Joi.object({
+const schema = Joi.object<DisplayNameAttributes>({
   ...JOI_ENTITY_BASE,
 
   name: Joi.string().required(),
@@ -44,31 +41,36 @@ export class DisplayName extends LindormEntity<DisplayNameAttributes> {
     }
 
     this.numbers.push(number);
-    this.addEvent(DisplayNameEvent.NUMBER_ADDED, { number });
+    this.updated = new Date();
   }
 
   public remove(number: number): void {
-    remove(this.numbers, number);
+    remove(this.numbers, (num) => num === number);
 
-    this.addEvent(DisplayNameEvent.NUMBER_REMOVED, { number });
+    this.updated = new Date();
   }
 
   public exists(number: number): boolean {
     return includes(this.numbers, number);
   }
 
-  public create(): void {
-    for (const evt of this.events) {
-      if (evt.name !== DisplayNameEvent.CREATED) continue;
-      throw new EntityCreationError("DisplayName");
-    }
+  public async generateNumber(): Promise<number> {
+    const maximumTries = 100;
+    let currentTry = 0;
 
-    const { events, ...rest } = this.toJSON();
-    this.addEvent(DisplayNameEvent.CREATED, rest);
+    while (currentTry < maximumTries) {
+      const number = await getRandomNumber(4);
+
+      if (!this.exists(number)) {
+        return number;
+      }
+
+      currentTry += 1;
+    }
   }
 
-  public getKey(): string {
-    return this.id;
+  public create(): void {
+    /* intentionally left empty */
   }
 
   public async schemaValidation(): Promise<void> {
