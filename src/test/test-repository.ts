@@ -1,18 +1,30 @@
-import { DisplayNameRepository, IdentityRepository } from "../infrastructure";
+import { getTestMongo } from "./test-infrastructure";
 import { winston } from "../logger";
-import { getTestMongo } from "./test-mongo";
+import {
+  DisplayNameRepository,
+  EmailRepository,
+  IdentityRepository,
+  OpenIdIdentifierRepository,
+  PhoneNumberRepository,
+} from "../infrastructure";
 
-export const getTestRepository = async (): Promise<{
+interface TestRepository {
   displayNameRepository: DisplayNameRepository;
+  emailRepository: EmailRepository;
   identityRepository: IdentityRepository;
-}> => {
-  const mongo = await getTestMongo();
+  openIdIdentifierRepository: OpenIdIdentifierRepository;
+  phoneNumberRepository: PhoneNumberRepository;
+}
 
+export const getTestRepository = async (): Promise<TestRepository> => {
+  const mongo = await getTestMongo();
   const db = mongo.database();
   const logger = winston;
-
   return {
     displayNameRepository: new DisplayNameRepository({ db, logger }),
+    emailRepository: new EmailRepository({ db, logger }),
     identityRepository: new IdentityRepository({ db, logger }),
+    openIdIdentifierRepository: new OpenIdIdentifierRepository({ db, logger }),
+    phoneNumberRepository: new PhoneNumberRepository({ db, logger }),
   };
 };

@@ -1,13 +1,15 @@
-import { Identity } from "../entity";
+import { Identity, IdentityOptions } from "../entity";
+import { NamingSystem } from "../enum";
 
-export const getTestIdentity = (): Identity =>
+export const getTestIdentity = (options: Partial<IdentityOptions> = {}): Identity =>
   new Identity({
+    id: "2796b8bc-08ce-4aec-ac42-6d026c7c6938",
     address: {
       country: "country",
       locality: "locality",
       postalCode: "postalCode",
       region: "region",
-      streetAddress: "streetAddress",
+      streetAddress: ["streetAddress1", "streetAddress2"],
     },
     birthDate: "2000-01-01",
     displayName: {
@@ -20,12 +22,16 @@ export const getTestIdentity = (): Identity =>
     gravatar: "https://gravatar.url/",
     locale: "sv-SE",
     middleName: "middleName",
+    namingSystem: NamingSystem.GIVEN_FAMILY,
     nickname: "nickname",
-    phoneNumber: "+46700000000",
-    phoneNumberVerified: false,
     picture: "https://picture.url/",
-    preferredUsername: "preferredUsername",
+    preferredAccessibility: ["setting1", "setting2", "setting3"],
+    preferredUsername: "username",
     profile: "https://profile.url/",
+    pronouns: "she/her",
+    socialSecurityNumber: "198412301545",
+    username: "username",
     website: "https://website.url/",
     zoneInfo: "Europe/Stockholm",
+    ...options,
   });

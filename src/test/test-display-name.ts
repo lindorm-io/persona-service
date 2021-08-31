@@ -1,7 +1,10 @@
-import { DisplayName } from "../entity";
+import { DisplayName, DisplayNameOptions } from "../entity";
 
-export const getTestDisplayName = (): DisplayName =>
+export const getTestDisplayName = (
+  options: Partial<DisplayNameOptions> = {},
+): DisplayName =>
   new DisplayName({
     name: "displayName",
-    numbers: [1234, 2345, 3456, 4567, 5678, 6789],
+    numbers: [1234],
+    ...options,
   });
