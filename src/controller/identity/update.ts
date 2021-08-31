@@ -1,133 +1,194 @@
-import { ClientError, ServerError } from "@lindorm-io/errors";
-import { Controller, ControllerResponse, HttpStatus } from "@lindorm-io/koa";
-import { IdentityAddress, IdentityContext } from "../../typing";
-import { IdentityAttributes } from "../../entity";
-import { Scope } from "../../enum";
-import { camelCase, getRandomNumber } from "@lindorm-io/core";
-import { includes } from "lodash";
+import Joi from "joi";
+import { Context, IdentityAddress } from "../../typing";
+import { Controller, ControllerResponse } from "@lindorm-io/koa";
+import {
+  JOI_BIRTHDATE,
+  JOI_GUID,
+  JOI_IDENTITY_ADDRESS,
+  JOI_IDENTITY_DISPLAY_NAME,
+  JOI_LOCALE,
+  JOI_NAMING_SYSTEM,
+  JOI_ZONE_INFO,
+} from "../../constant";
+import { NamingSystem, Scope } from "../../enum";
+import { includes, isEqual } from "lodash";
+import { updateIdentityDisplayName } from "../../handler";
 
-const ALWAYS_ALLOWED_SCOPE = ["displayName", "gravatar"];
+interface RequestData {
+  id: string;
 
-interface RequestBody {
-  address?: IdentityAddress;
-  birthDate?: string | null;
-  displayName?: string | null;
-  familyName?: string | null;
-  gender?: string | null;
-  givenName?: string | null;
-  gravatar?: string | null;
-  locale?: string | null;
-  middleName?: string | null;
-  nickname?: string | null;
-  phoneNumber?: string | null;
-  picture?: string | null;
-  preferredUsername?: string | null;
-  profile?: string | null;
-  website?: string | null;
-  zoneInfo?: string | null;
+  address: IdentityAddress;
+  birthDate: string;
+  displayName: string;
+  familyName: string;
+  gender: string;
+  givenName: string;
+  gravatar: string;
+  locale: string;
+  middleName: string;
+  namingSystem: NamingSystem;
+  nickname: string;
+  picture: string;
+  preferredAccessibility: Array<string>;
+  preferredUsername: string;
+  profile: string;
+  pronouns: string;
+  socialSecurityNumber: string;
+  username: string;
+  website: string;
+  zoneInfo: string;
 }
 
-type ResponseBody = Record<string, never>;
+export const identityUpdateSchema = Joi.object<RequestData>({
+  id: JOI_GUID.required(),
 
-export const identityUpdate: Controller<IdentityContext<RequestBody>> = async (
+  address: JOI_IDENTITY_ADDRESS.optional(),
+  birthDate: JOI_BIRTHDATE.allow(null).optional(),
+  displayName: JOI_IDENTITY_DISPLAY_NAME.optional(),
+  familyName: Joi.string().allow(null).optional(),
+  gender: Joi.string().allow(null).optional(),
+  givenName: Joi.string().allow(null).optional(),
+  gravatar: Joi.string().uri().allow(null).optional(),
+  locale: JOI_LOCALE.allow(null).optional(),
+  middleName: Joi.string().allow(null).optional(),
+  namingSystem: JOI_NAMING_SYSTEM.optional(),
+  nickname: Joi.string().allow(null).optional(),
+  picture: Joi.string().uri().allow(null).optional(),
+  preferredAccessibility: Joi.array().items(Joi.string()).optional(),
+  preferredUsername: Joi.string().allow(null).optional(),
+  profile: Joi.string().uri().allow(null).optional(),
+  pronouns: Joi.string().allow(null).optional(),
+  socialSecurityNumber: Joi.string().allow(null).optional(),
+  username: Joi.string().lowercase().allow(null).optional(),
+  website: Joi.string().uri().allow(null).optional(),
+  zoneInfo: JOI_ZONE_INFO.allow(null).optional(),
+});
+
+export const identityUpdateController: Controller<Context<RequestData>> = async (
   ctx,
-): Promise<ControllerResponse<ResponseBody>> => {
+): ControllerResponse<Record<string, never>> => {
   const {
+    data: {
+      address,
+      birthDate,
+      displayName,
+      familyName,
+      gender,
+      givenName,
+      gravatar,
+      locale,
+      middleName,
+      namingSystem,
+      nickname,
+      picture,
+      preferredAccessibility,
+      preferredUsername,
+      profile,
+      pronouns,
+      socialSecurityNumber,
+      username,
+      website,
+      zoneInfo,
+    },
     entity: { identity },
-    logger,
-    repository: { displayNameRepository, identityRepository },
-    request: { body },
-    token: { bearerToken },
+    repository: { identityRepository },
+    token: {
+      bearerToken: { scopes },
+    },
   } = ctx;
 
-  if (!includes(bearerToken.scope, Scope.EDIT)) {
-    throw new ClientError("Forbidden", {
-      description: "Invalid scope",
-      statusCode: ClientError.StatusCode.FORBIDDEN,
-    });
-  }
-
-  const claims = bearerToken.scope.map(camelCase) as Array<keyof IdentityAttributes>;
-
-  for (const key of Object.keys(body)) {
-    if (includes(ALWAYS_ALLOWED_SCOPE, key)) continue;
-
-    if (!includes(claims, key)) {
-      throw new ClientError("Forbidden", {
-        data: { key },
-        debug: { bearerToken },
-        description: "Invalid scope",
-        statusCode: ClientError.StatusCode.FORBIDDEN,
-      });
+  if (includes(scopes, Scope.ADDRESS)) {
+    if (address && !isEqual(identity.address, address)) {
+      identity.address = address;
     }
   }
 
-  const {
-    address,
-    birthDate,
-    displayName,
-    familyName,
-    gender,
-    givenName,
-    gravatar,
-    locale,
-    middleName,
-    nickname,
-    phoneNumber,
-    picture,
-    preferredUsername,
-    profile,
-    website,
-    zoneInfo,
-  } = body;
-
-  if (displayName !== undefined) {
-    const displayNameEntity = await displayNameRepository.findOrCreate({ name: displayName });
-
-    const timeout = 999;
-
-    let count = 0;
-    let number = await getRandomNumber(4);
-
-    while (count !== timeout && displayNameEntity.exists(number)) {
-      count += 1;
-      number = await getRandomNumber(4);
+  if (includes(scopes, Scope.PROFILE)) {
+    if (birthDate && birthDate !== identity.birthDate) {
+      identity.birthDate = birthDate;
     }
 
-    if (count === timeout) {
-      throw new ServerError("Unable to find number for displayName");
+    if (displayName && displayName !== identity.displayName.name) {
+      await updateIdentityDisplayName(ctx, identity, displayName);
     }
 
-    displayNameEntity.add(number);
+    if (familyName && familyName !== identity.familyName) {
+      identity.familyName = familyName;
+    }
 
-    await displayNameRepository.update(displayNameEntity);
+    if (gender && gender !== identity.gender) {
+      identity.gender = gender;
+    }
 
-    identity.displayName.name = displayName;
-    identity.displayName.number = number;
+    if (givenName && givenName !== identity.givenName) {
+      identity.givenName = givenName;
+    }
+
+    if (gravatar && gravatar !== identity.gravatar) {
+      identity.gravatar = gravatar;
+    }
+
+    if (locale && locale !== identity.locale) {
+      identity.locale = locale;
+    }
+
+    if (middleName && middleName !== identity.middleName) {
+      identity.middleName = middleName;
+    }
+
+    if (namingSystem && namingSystem !== identity.namingSystem) {
+      identity.namingSystem = namingSystem;
+    }
+
+    if (nickname && nickname !== identity.nickname) {
+      identity.nickname = nickname;
+    }
+
+    if (picture && picture !== identity.picture) {
+      identity.picture = picture;
+    }
+
+    if (
+      preferredAccessibility &&
+      !isEqual(preferredAccessibility, identity.preferredAccessibility)
+    ) {
+      identity.preferredAccessibility = preferredAccessibility;
+    }
+
+    if (preferredUsername && preferredUsername !== identity.preferredUsername) {
+      identity.preferredUsername = preferredUsername;
+    }
+
+    if (profile && profile !== identity.profile) {
+      identity.profile = profile;
+    }
+
+    if (pronouns && pronouns !== identity.pronouns) {
+      identity.pronouns = pronouns;
+    }
+
+    if (website && website !== identity.website) {
+      identity.website = website;
+    }
+
+    if (zoneInfo && zoneInfo !== identity.zoneInfo) {
+      identity.zoneInfo = zoneInfo;
+    }
   }
 
-  if (address !== undefined) identity.address = address;
-  if (birthDate !== undefined) identity.birthDate = birthDate;
-  if (familyName !== undefined) identity.familyName = familyName;
-  if (gender !== undefined) identity.gender = gender;
-  if (givenName !== undefined) identity.givenName = givenName;
-  if (gravatar !== undefined) identity.gravatar = gravatar;
-  if (locale !== undefined) identity.locale = locale;
-  if (middleName !== undefined) identity.middleName = middleName;
-  if (nickname !== undefined) identity.nickname = nickname;
-  if (phoneNumber !== undefined) identity.phoneNumber = phoneNumber;
-  if (picture !== undefined) identity.picture = picture;
-  if (preferredUsername !== undefined) identity.preferredUsername = preferredUsername;
-  if (profile !== undefined) identity.profile = profile;
-  if (website !== undefined) identity.website = website;
-  if (zoneInfo !== undefined) identity.zoneInfo = zoneInfo;
+  if (includes(scopes, Scope.PRIVATE)) {
+    if (socialSecurityNumber && socialSecurityNumber !== identity.socialSecurityNumber) {
+      identity.socialSecurityNumber = socialSecurityNumber;
+    }
+
+    if (username && username !== identity.username) {
+      identity.username = username;
+    }
+  }
 
   await identityRepository.update(identity);
 
-  logger.info("identity update resolved", {});
-
   return {
-    body: {},
-    status: HttpStatus.Success.NO_CONTENT,
+    data: {},
   };
 };

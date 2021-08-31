@@ -1,55 +1,124 @@
-import { identityGet } from "./get";
-import { getTestIdentity, logger } from "../../test";
 import { Scope } from "../../enum";
+import { getTestIdentity } from "../../test";
+import { identityGetController } from "./get";
 
-describe("identityGet", () => {
+jest.mock("../../handler", () => ({
+  getConnectedProviders: jest.fn().mockImplementation(() => "getConnectedProviders"),
+}));
+jest.mock("../../util", () => ({
+  getDisplayName: jest.fn().mockImplementation(() => "getDisplayName"),
+}));
+
+describe("identityGetController", () => {
   let ctx: any;
 
   beforeEach(() => {
     ctx = {
-      logger,
       entity: {
-        identity: getTestIdentity(),
+        identity: getTestIdentity({
+          id: "identityId",
+        }),
+      },
+      repository: {
+        emailRepository: {
+          findMany: jest.fn().mockResolvedValue([
+            { email: "email1", primary: true, verified: true },
+            { email: "email2", primary: false, verified: true },
+            { email: "email3", primary: false, verified: false },
+          ]),
+        },
+        phoneNumberRepository: {
+          findMany: jest.fn().mockResolvedValue([
+            { phoneNumber: "phoneNumber1", primary: true, verified: true },
+            { phoneNumber: "phoneNumber2", primary: false, verified: true },
+            { phoneNumber: "phoneNumber3", primary: false, verified: false },
+          ]),
+        },
       },
       token: {
         bearerToken: {
-          scope: [
-            Scope.DEFAULT,
-            Scope.EDIT,
-            Scope.OPENID,
-            Scope.ADDRESS,
-            Scope.BIRTH_DATE,
-            Scope.EMAIL,
-            Scope.FAMILY_NAME,
-            Scope.GENDER,
-            Scope.GIVEN_NAME,
-            Scope.LOCALE,
-            Scope.MIDDLE_NAME,
-            Scope.NICKNAME,
-            Scope.PHONE_NUMBER,
-            Scope.PICTURE,
-            Scope.PREFERRED_USERNAME,
-            Scope.PROFILE,
-            Scope.WEBSITE,
-            Scope.ZONE_INFO,
-          ],
+          scopes: [Scope.OPENID],
+          subject: "identityId",
         },
       },
     };
   });
 
-  test("should resolve with fully scoped identity data", async () => {
-    await expect(identityGet(ctx)).resolves.toStrictEqual({
-      body: {
+  test("should resolve with address data", async () => {
+    ctx.token.bearerToken.scopes.push(Scope.ADDRESS);
+
+    await expect(identityGetController(ctx)).resolves.toStrictEqual({
+      data: {
         address: {
           country: "country",
           locality: "locality",
           postalCode: "postalCode",
           region: "region",
-          streetAddress: "streetAddress",
+          streetAddress: ["streetAddress1", "streetAddress2"],
         },
+      },
+    });
+  });
+
+  test("should resolve with email data", async () => {
+    ctx.token.bearerToken.scopes.push(Scope.EMAIL);
+
+    await expect(identityGetController(ctx)).resolves.toStrictEqual({
+      data: {
+        emails: [
+          {
+            email: "email1",
+            primary: true,
+            verified: true,
+          },
+          {
+            email: "email2",
+            primary: false,
+            verified: true,
+          },
+          {
+            email: "email3",
+            primary: false,
+            verified: false,
+          },
+        ],
+      },
+    });
+  });
+
+  test("should resolve with phone data", async () => {
+    ctx.token.bearerToken.scopes.push(Scope.PHONE);
+
+    await expect(identityGetController(ctx)).resolves.toStrictEqual({
+      data: {
+        phoneNumbers: [
+          {
+            phoneNumber: "phoneNumber1",
+            primary: true,
+            verified: true,
+          },
+          {
+            phoneNumber: "phoneNumber2",
+            primary: false,
+            verified: true,
+          },
+          {
+            phoneNumber: "phoneNumber3",
+            primary: false,
+            verified: false,
+          },
+        ],
+      },
+    });
+  });
+
+  test("should resolve with profile data", async () => {
+    ctx.token.bearerToken.scopes.push(Scope.PROFILE);
+
+    await expect(identityGetController(ctx)).resolves.toStrictEqual({
+      data: {
         birthDate: "2000-01-01",
-        displayName: "displayName#1234",
+        displayName: "getDisplayName",
         familyName: "familyName",
         gender: "gender",
         givenName: "givenName",
@@ -57,36 +126,25 @@ describe("identityGet", () => {
         locale: "sv-SE",
         middleName: "middleName",
         nickname: "nickname",
-        phoneNumber: "+46700000000",
         picture: "https://picture.url/",
-        preferredUsername: "preferredUsername",
+        preferredUsername: "username",
         profile: "https://profile.url/",
+        pronouns: "she/her",
         website: "https://website.url/",
         zoneInfo: "Europe/Stockholm",
       },
-      status: 200,
     });
   });
 
-  test("should resolve with only scoped data", async () => {
-    ctx.token.bearerToken.scope = [
-      Scope.DEFAULT,
-      Scope.EDIT,
-      Scope.OPENID,
-      Scope.FAMILY_NAME,
-      Scope.GIVEN_NAME,
-      Scope.MIDDLE_NAME,
-    ];
+  test("should resolve with private data", async () => {
+    ctx.token.bearerToken.scopes.push(Scope.PRIVATE);
 
-    await expect(identityGet(ctx)).resolves.toStrictEqual({
-      body: {
-        displayName: "displayName#1234",
-        familyName: "familyName",
-        givenName: "givenName",
-        gravatar: "https://gravatar.url/",
-        middleName: "middleName",
+    await expect(identityGetController(ctx)).resolves.toStrictEqual({
+      data: {
+        connectedProviders: "getConnectedProviders",
+        socialSecurityNumber: "198412301545",
+        username: "username",
       },
-      status: 200,
     });
   });
 });
