@@ -1,4 +1,4 @@
-import { Identity, IdentityAttributes } from "../entity";
+import { Identity, IdentityAttributes } from "../../entity";
 import { LindormRepository, RepositoryOptions } from "@lindorm-io/mongo";
 
 export class IdentityRepository extends LindormRepository<IdentityAttributes, Identity> {
@@ -6,7 +6,12 @@ export class IdentityRepository extends LindormRepository<IdentityAttributes, Id
     super({
       ...options,
       collectionName: "identity",
-      indices: [],
+      indices: [
+        {
+          index: { username: 1 },
+          options: { unique: true },
+        },
+      ],
     });
   }
 

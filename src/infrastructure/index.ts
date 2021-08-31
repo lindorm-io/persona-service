@@ -1,2 +1,2 @@
-export * from "./DisplayNameRepository";
-export * from "./IdentityRepository";
+export * from "./cache";
+export * from "./repository";

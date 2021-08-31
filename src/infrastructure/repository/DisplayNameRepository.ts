@@ -1,7 +1,10 @@
-import { DisplayName, DisplayNameAttributes } from "../entity";
+import { DisplayName, DisplayNameAttributes } from "../../entity";
 import { LindormRepository, RepositoryOptions } from "@lindorm-io/mongo";
 
-export class DisplayNameRepository extends LindormRepository<DisplayNameAttributes, DisplayName> {
+export class DisplayNameRepository extends LindormRepository<
+  DisplayNameAttributes,
+  DisplayName
+> {
   public constructor(options: RepositoryOptions) {
     super({
       ...options,
