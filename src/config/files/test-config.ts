@@ -1,21 +1,40 @@
-import { IConfigurationData } from "../ConfigHandler";
+import { Configuration } from "../interface";
 
-export const testConfig: IConfigurationData = {
+export const testConfig: Configuration = {
   NODE_ENVIRONMENT: process.env.NODE_ENV,
-  SERVER_PORT: 3000,
-  HOST: "https://test.identity.lindorm.io",
+  SERVER_PORT: 3002,
+  HOST: "https://identity.test.api.lindorm.io",
 
+  // Basic Auth
   BASIC_AUTH_USERNAME: "secret",
   BASIC_AUTH_PASSWORD: "secret",
 
-  AUTH_JWT_ISSUER: "https://test.authentication.lindorm.io",
-  AUTH_WEB_KEY_HOST: "https://test.authentication.lindorm.io",
+  // Bearer Auth
+  BEARER_TOKEN_ISSUER: "https://oauth.test.api.lindorm.io",
 
+  // Crypto
+  CRYPTO_AES_SECRET: "secret",
+  CRYPTO_SHA_SECRET: "secret",
+
+  // Expiry
+  EXPIRY_CONNECT_IDENTIFIER_SESSION: "2 hours",
+
+  // Services
+  AUTHENTICATION_SERVICE_HOST: "https://authentication.test.api.lindorm.io",
+  COMMUNICATION_SERVICE_HOST: "https://communication.test.api.lindorm.io",
+  COMMUNICATION_SERVICE_USERNAME: "secret",
+  COMMUNICATION_SERVICE_PASSWORD: "secret",
+  OAUTH_SERVICE_HOST: "https://oauth.test.api.lindorm.io",
+
+  // Redis
+  REDIS_HOST: "localhost",
   REDIS_PORT: 6379,
+  REDIS_PASSWORD: "secret",
 
-  MONGO_INITDB_ROOT_USERNAME: "root",
-  MONGO_INITDB_ROOT_PASSWORD: "example",
+  // Mongo
   MONGO_HOST: "localhost",
-  MONGO_EXPOSE_PORT: 27017,
-  MONGO_DB_NAME: "identity",
+  MONGO_PORT: 27017,
+  MONGO_DB_NAME: "authorization",
+  MONGO_USERNAME: "secret",
+  MONGO_PASSWORD: "secret",
 };

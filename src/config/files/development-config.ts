@@ -1,21 +1,40 @@
-import { IConfigurationData } from "../ConfigHandler";
+import { Configuration } from "../interface";
 
-export const developmentConfig: IConfigurationData = {
+export const developmentConfig: Configuration = {
   NODE_ENVIRONMENT: process.env.NODE_ENV,
   SERVER_PORT: 3002,
-  HOST: "http://localhost/",
+  HOST: "http://localhost",
 
+  // Basic Auth
   BASIC_AUTH_USERNAME: "secret",
   BASIC_AUTH_PASSWORD: "secret",
 
-  AUTH_JWT_ISSUER: "https://dev.authentication.lindorm.io",
-  AUTH_WEB_KEY_HOST: "http://localhost:3001",
+  // Bearer Auth
+  BEARER_TOKEN_ISSUER: "http://localhost:3004",
 
+  // Crypto
+  CRYPTO_AES_SECRET: "secret",
+  CRYPTO_SHA_SECRET: "secret",
+
+  // Expiry
+  EXPIRY_CONNECT_IDENTIFIER_SESSION: "2 hours",
+
+  // Services
+  AUTHENTICATION_SERVICE_HOST: "http://localhost:3005",
+  COMMUNICATION_SERVICE_HOST: "http://localhost:3009",
+  COMMUNICATION_SERVICE_USERNAME: "secret",
+  COMMUNICATION_SERVICE_PASSWORD: "secret",
+  OAUTH_SERVICE_HOST: "http://localhost:3004",
+
+  // Redis
+  REDIS_HOST: "localhost",
   REDIS_PORT: 6379,
+  REDIS_PASSWORD: "secret",
 
-  MONGO_INITDB_ROOT_USERNAME: "root",
-  MONGO_INITDB_ROOT_PASSWORD: "example",
+  // Mongo
   MONGO_HOST: "localhost",
-  MONGO_EXPOSE_PORT: 27017,
+  MONGO_PORT: 27017,
   MONGO_DB_NAME: "identity",
+  MONGO_USERNAME: "root",
+  MONGO_PASSWORD: "example",
 };
