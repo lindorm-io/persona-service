@@ -1,2 +1,3 @@
-# @lindorm-io/device-service
-Device Service
+# @lindorm-io/identity-service
+
+Identity Service
