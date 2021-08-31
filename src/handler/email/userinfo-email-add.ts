@@ -1,0 +1,38 @@
+import { Context } from "../../typing";
+import { Email } from "../../entity";
+import { EntityNotFoundError } from "@lindorm-io/entity";
+
+interface Options {
+  identityId: string;
+  email: string;
+}
+
+export const userinfoEmailAdd = async (
+  ctx: Context,
+  options: Options,
+): Promise<Email> => {
+  const {
+    repository: { emailRepository },
+  } = ctx;
+
+  const { identityId, email } = options;
+
+  try {
+    return await emailRepository.find({ email });
+  } catch (err) {
+    if (!(err instanceof EntityNotFoundError)) {
+      throw err;
+    }
+  }
+
+  const amount = await emailRepository.count({ identityId });
+
+  return await emailRepository.create(
+    new Email({
+      identityId,
+      email,
+      primary: amount < 1,
+      verified: false,
+    }),
+  );
+};
