@@ -1,12 +1,12 @@
 import { ClientError } from "@lindorm-io/errors";
 import { IdentifierType } from "../../enum";
+import { getTestIdentity, logger } from "../../test";
 import { identifierRemoveController } from "./remove";
 import {
   removeEmail as _removeEmail,
   removePhoneNumber as _removePhoneNumber,
   removeOpenIdIdentifier as _removeOpenIdIdentifier,
 } from "../../handler";
-import { getTestIdentity } from "../../test";
 
 jest.mock("../../handler", () => ({
   removeEmail: jest.fn(),
@@ -32,6 +32,7 @@ describe("identifierRemoveController", () => {
       entity: {
         identity: getTestIdentity({ id: "identityId" }),
       },
+      logger,
     };
   });
 

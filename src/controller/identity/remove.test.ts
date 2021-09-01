@@ -1,5 +1,5 @@
 import { Scope } from "../../enum";
-import { getTestIdentity } from "../../test";
+import { getTestIdentity, logger } from "../../test";
 import { identityRemoveController } from "./remove";
 import { removeIdentityDisplayName as _removeIdentityDisplayName } from "../../handler";
 
@@ -19,6 +19,7 @@ describe("identityRemoveController", () => {
           id: "identityId",
         }),
       },
+      logger,
       repository: {
         emailRepository: {
           removeMany: jest.fn(),

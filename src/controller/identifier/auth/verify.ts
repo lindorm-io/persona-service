@@ -54,35 +54,46 @@ export const identifierAuthVerifyController: Controller<Context<RequestData>> = 
 ): ControllerResponse<ResponseData> => {
   const {
     data: { email, identifier, phoneNumber, provider, type, username },
+    logger,
     repository: { identityRepository },
   } = ctx;
 
-  let identity: Identity;
+  logger.debug("identifierAuthVerifyController", ctx.data);
 
-  switch (type) {
-    case IdentifierType.EMAIL:
-      identity = await verifyEmail(ctx, email);
-      break;
+  try {
+    let identity: Identity;
 
-    case IdentifierType.PHONE_NUMBER:
-      identity = await verifyPhoneNumber(ctx, phoneNumber);
-      break;
+    switch (type) {
+      case IdentifierType.EMAIL:
+        identity = await verifyEmail(ctx, email);
+        break;
 
-    case IdentifierType.OIDC:
-      identity = await verifyOpenIdIdentifier(ctx, { identifier, provider });
-      break;
+      case IdentifierType.PHONE_NUMBER:
+        identity = await verifyPhoneNumber(ctx, phoneNumber);
+        break;
 
-    case IdentifierType.USERNAME:
-      identity = await identityRepository.find({ username });
-      break;
+      case IdentifierType.OIDC:
+        identity = await verifyOpenIdIdentifier(ctx, { identifier, provider });
+        break;
 
-    default:
-      throw new ClientError("Unexpected identifier type");
+      case IdentifierType.USERNAME:
+        identity = await identityRepository.find({ username });
+        break;
+
+      default:
+        throw new ClientError("Unexpected identifier type");
+    }
+
+    logger.debug("identifierAuthVerifyController successful");
+
+    return {
+      data: {
+        identityId: identity.id,
+      },
+    };
+  } catch (err: any) {
+    logger.error("identifierAuthVerifyController failure", err);
+
+    throw err;
   }
-
-  return {
-    data: {
-      identityId: identity.id,
-    },
-  };
 };

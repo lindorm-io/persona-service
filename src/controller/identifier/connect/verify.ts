@@ -22,22 +22,33 @@ export const identifierConnectVerifyController: Controller<Context<RequestData>>
   const {
     data: { code },
     entity: { connectSession },
+    logger,
   } = ctx;
 
-  switch (connectSession.type) {
-    case IdentifierType.EMAIL:
-      await connectEmailVerify(ctx, connectSession, code);
-      break;
+  logger.debug("identifierConnectVerifyController");
 
-    case IdentifierType.PHONE_NUMBER:
-      await connectPhoneNumberVerify(ctx, connectSession, code);
-      break;
+  try {
+    switch (connectSession.type) {
+      case IdentifierType.EMAIL:
+        await connectEmailVerify(ctx, connectSession, code);
+        break;
 
-    default:
-      throw new ClientError("Unexpected identifier type");
+      case IdentifierType.PHONE_NUMBER:
+        await connectPhoneNumberVerify(ctx, connectSession, code);
+        break;
+
+      default:
+        throw new ClientError("Unexpected identifier type");
+    }
+
+    logger.debug("identifierConnectVerifyController successful");
+
+    return {
+      data: {},
+    };
+  } catch (err: any) {
+    logger.error("identifierConnectVerifyController failure", err);
+
+    throw err;
   }
-
-  return {
-    data: {},
-  };
 };

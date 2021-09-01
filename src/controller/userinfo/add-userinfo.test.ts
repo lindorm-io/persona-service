@@ -1,4 +1,5 @@
 import { Identity } from "../../entity";
+import { logger } from "../../test";
 import { userinfoAddController } from "./add-userinfo";
 
 jest.mock("../../handler", () => ({
@@ -45,6 +46,7 @@ describe("userinfoAddController", () => {
       entity: {
         identity: new Identity({}),
       },
+      logger,
       repository: {
         identityRepository: {
           update: jest.fn(),

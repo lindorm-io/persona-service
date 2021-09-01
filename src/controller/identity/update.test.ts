@@ -1,5 +1,5 @@
 import { Scope } from "../../enum";
-import { getTestIdentity } from "../../test";
+import { getTestIdentity, logger } from "../../test";
 import { identityUpdateController } from "./update";
 import { updateIdentityDisplayName as _updateIdentityDisplayName } from "../../handler";
 
@@ -47,6 +47,7 @@ describe("identityUpdateController", () => {
           id: "identityId",
         }),
       },
+      logger,
       repository: {
         identityRepository: {
           update: jest.fn(),

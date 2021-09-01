@@ -1,11 +1,11 @@
 import { ClientError } from "@lindorm-io/errors";
 import { IdentifierType } from "../../../enum";
+import { getTestIdentity, logger } from "../../../test";
 import { identifierConnectInitialiseController } from "./initialise";
 import {
   connectEmailInitialise as _connectEmailInitialise,
   connectPhoneNumberInitialise as _connectPhoneNumberInitialise,
 } from "../../../handler";
-import { getTestIdentity } from "../../../test";
 
 jest.mock("../../../handler", () => ({
   connectEmailInitialise: jest.fn(),
@@ -29,6 +29,7 @@ describe("identifierConnectInitialiseController", () => {
       entity: {
         identity: getTestIdentity({ id: "identityId" }),
       },
+      logger,
     };
   });
 

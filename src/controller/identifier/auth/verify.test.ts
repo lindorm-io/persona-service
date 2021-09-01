@@ -1,6 +1,7 @@
+import { ClientError } from "@lindorm-io/errors";
 import { IdentifierType } from "../../../enum";
 import { identifierAuthVerifyController } from "./verify";
-import { ClientError } from "@lindorm-io/errors";
+import { logger } from "../../../test";
 
 jest.mock("../../../handler", () => ({
   verifyEmail: jest.fn().mockResolvedValue({ id: "email", disabled: false }),
@@ -21,6 +22,7 @@ describe("identifierAuthVerifyController", () => {
         type: "type",
         username: "username",
       },
+      logger,
       repository: {
         identityRepository: {
           find: jest.fn().mockResolvedValue({ id: "username", disabled: false }),

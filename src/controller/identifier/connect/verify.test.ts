@@ -1,6 +1,7 @@
 import { ClientError } from "@lindorm-io/errors";
 import { IdentifierType } from "../../../enum";
 import { identifierConnectVerifyController } from "./verify";
+import { logger } from "../../../test";
 import {
   connectEmailVerify as _connectEmailVerify,
   connectPhoneNumberVerify as _connectPhoneNumberVerify,
@@ -25,6 +26,7 @@ describe("identifierConnectVerifyController", () => {
       entity: {
         connectSession: { type: "type" },
       },
+      logger,
     };
   });
 

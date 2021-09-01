@@ -40,28 +40,39 @@ export const identifierConnectInitialiseController: Controller<Context<RequestDa
     const {
       data: { email, phoneNumber, type },
       entity: { identity },
+      logger,
     } = ctx;
 
-    switch (type) {
-      case IdentifierType.EMAIL:
-        await connectEmailInitialise(ctx, {
-          identityId: identity.id,
-          email,
-        });
-        break;
+    logger.debug("identifierConnectInitialiseController", ctx.data);
 
-      case IdentifierType.PHONE_NUMBER:
-        await connectPhoneNumberInitialise(ctx, {
-          identityId: identity.id,
-          phoneNumber,
-        });
-        break;
+    try {
+      switch (type) {
+        case IdentifierType.EMAIL:
+          await connectEmailInitialise(ctx, {
+            identityId: identity.id,
+            email,
+          });
+          break;
 
-      default:
-        throw new ClientError("Unexpected identifier type");
+        case IdentifierType.PHONE_NUMBER:
+          await connectPhoneNumberInitialise(ctx, {
+            identityId: identity.id,
+            phoneNumber,
+          });
+          break;
+
+        default:
+          throw new ClientError("Unexpected identifier type");
+      }
+
+      logger.debug("identifierConnectInitialiseController successful");
+
+      return {
+        data: {},
+      };
+    } catch (err: any) {
+      logger.error("identifierConnectInitialiseController failure", err);
+
+      throw err;
     }
-
-    return {
-      data: {},
-    };
   };

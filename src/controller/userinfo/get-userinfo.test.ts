@@ -1,4 +1,4 @@
-import { getTestIdentity } from "../../test";
+import { getTestIdentity, logger } from "../../test";
 import { userinfoGetController } from "./get-userinfo";
 
 jest.mock("../../handler", () => ({
@@ -29,6 +29,7 @@ describe("userinfoGetController", () => {
           updated: new Date("2021-01-01T08:00:00.000Z"),
         }),
       },
+      logger,
     };
   });
 

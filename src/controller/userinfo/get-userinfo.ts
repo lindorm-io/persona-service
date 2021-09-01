@@ -21,79 +21,90 @@ export const userinfoGetController: Controller<Context<RequestData>> = async (
 ): ControllerResponse<ResponseData> => {
   const {
     entity: { identity },
+    logger,
   } = ctx;
 
-  const {
-    id,
-    birthDate,
-    familyName,
-    gender,
-    givenName,
-    gravatar,
-    locale,
-    middleName,
-    nickname,
-    picture,
-    preferredAccessibility,
-    preferredUsername,
-    profile,
-    pronouns,
-    socialSecurityNumber,
-    updated,
-    username,
-    website,
-    zoneInfo,
-  } = identity;
+  logger.debug("userinfoGetController", ctx.data);
 
-  const address = getAddress(identity);
-  const displayName = getDisplayName(identity);
-  const name = getName(identity);
-
-  const { email, emailVerified } = await userinfoEmailGet(ctx, identity.id);
-  const { phoneNumber, phoneNumberVerified } = await userinfoPhoneNumberGet(
-    ctx,
-    identity.id,
-  );
-
-  return {
-    data: {
-      // always
-      sub: id,
-      updatedAt: TokenIssuer.getUnixTime(updated),
-
-      // address
-      address,
-
-      // email
-      email,
-      emailVerified,
-
-      // phone
-      phoneNumber,
-      phoneNumberVerified,
-
-      // profile
+  try {
+    const {
+      id,
       birthDate,
-      displayName,
       familyName,
       gender,
       givenName,
       gravatar,
       locale,
       middleName,
-      name,
       nickname,
       picture,
       preferredAccessibility,
       preferredUsername,
       profile,
       pronouns,
+      socialSecurityNumber,
+      updated,
+      username,
       website,
       zoneInfo,
+    } = identity;
 
-      // private
-      socialSecurityNumber,
-      username,
-    },
-  };
+    const address = getAddress(identity);
+    const displayName = getDisplayName(identity);
+    const name = getName(identity);
+
+    const { email, emailVerified } = await userinfoEmailGet(ctx, identity.id);
+    const { phoneNumber, phoneNumberVerified } = await userinfoPhoneNumberGet(
+      ctx,
+      identity.id,
+    );
+
+    logger.debug("userinfoGetController successful");
+
+    return {
+      data: {
+        // always
+        sub: id,
+        updatedAt: TokenIssuer.getUnixTime(updated),
+
+        // address
+        address,
+
+        // email
+        email,
+        emailVerified,
+
+        // phone
+        phoneNumber,
+        phoneNumberVerified,
+
+        // profile
+        birthDate,
+        displayName,
+        familyName,
+        gender,
+        givenName,
+        gravatar,
+        locale,
+        middleName,
+        name,
+        nickname,
+        picture,
+        preferredAccessibility,
+        preferredUsername,
+        profile,
+        pronouns,
+        website,
+        zoneInfo,
+
+        // private
+        socialSecurityNumber,
+        username,
+      },
+    };
+  } catch (err: any) {
+    logger.error("userinfoGetController failure", err);
+
+    throw err;
+  }
 };

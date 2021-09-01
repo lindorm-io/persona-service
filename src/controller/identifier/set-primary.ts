@@ -41,28 +41,39 @@ export const identifierSetPrimaryController: Controller<Context<RequestData>> = 
   const {
     data: { email, phoneNumber, type },
     entity: { identity },
+    logger,
   } = ctx;
 
-  switch (type) {
-    case IdentifierType.EMAIL:
-      await setPrimaryEmail(ctx, {
-        identityId: identity.id,
-        email,
-      });
-      break;
+  logger.debug("identifierSetPrimaryController", ctx.data);
 
-    case IdentifierType.PHONE_NUMBER:
-      await setPrimaryPhoneNumber(ctx, {
-        identityId: identity.id,
-        phoneNumber,
-      });
-      break;
+  try {
+    switch (type) {
+      case IdentifierType.EMAIL:
+        await setPrimaryEmail(ctx, {
+          identityId: identity.id,
+          email,
+        });
+        break;
 
-    default:
-      throw new ClientError("Unexpected identifier type");
+      case IdentifierType.PHONE_NUMBER:
+        await setPrimaryPhoneNumber(ctx, {
+          identityId: identity.id,
+          phoneNumber,
+        });
+        break;
+
+      default:
+        throw new ClientError("Unexpected identifier type");
+    }
+
+    logger.debug("identifierSetPrimaryController successful");
+
+    return {
+      data: {},
+    };
+  } catch (err: any) {
+    logger.error("identifierSetPrimaryController failure", err);
+
+    throw err;
   }
-
-  return {
-    data: {},
-  };
 };

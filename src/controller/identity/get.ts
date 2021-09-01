@@ -52,71 +52,82 @@ export const identityGetController: Controller<Context<RequestData>> = async (
 ): ControllerResponse<Partial<ResponseData>> => {
   const {
     entity: { identity },
+    logger,
     repository: { emailRepository, phoneNumberRepository },
     token: {
       bearerToken: { scopes },
     },
   } = ctx;
 
-  const data: Partial<ResponseData> = {};
+  logger.debug("identityGetController", ctx.data);
 
-  if (includes(scopes, Scope.ADDRESS)) {
-    data.address = identity.address;
-  }
+  try {
+    const data: Partial<ResponseData> = {};
 
-  if (includes(scopes, Scope.EMAIL)) {
-    data.emails = [];
-
-    const list = await emailRepository.findMany({ identityId: identity.id });
-
-    for (const item of list) {
-      data.emails.push({
-        email: item.email,
-        primary: item.primary,
-        verified: item.verified,
-      });
+    if (includes(scopes, Scope.ADDRESS)) {
+      data.address = identity.address;
     }
-  }
 
-  if (includes(scopes, Scope.PHONE)) {
-    data.phoneNumbers = [];
+    if (includes(scopes, Scope.EMAIL)) {
+      data.emails = [];
 
-    const list = await phoneNumberRepository.findMany({ identityId: identity.id });
+      const list = await emailRepository.findMany({ identityId: identity.id });
 
-    for (const item of list) {
-      data.phoneNumbers.push({
-        phoneNumber: item.phoneNumber,
-        primary: item.primary,
-        verified: item.verified,
-      });
+      for (const item of list) {
+        data.emails.push({
+          email: item.email,
+          primary: item.primary,
+          verified: item.verified,
+        });
+      }
     }
-  }
 
-  if (includes(scopes, Scope.PROFILE)) {
-    data.birthDate = identity.birthDate;
-    data.displayName = getDisplayName(identity);
-    data.familyName = identity.familyName;
-    data.gender = identity.gender;
-    data.givenName = identity.givenName;
-    data.gravatar = identity.gravatar;
-    data.locale = identity.locale;
-    data.middleName = identity.middleName;
-    data.nickname = identity.nickname;
-    data.picture = identity.picture;
-    data.preferredUsername = identity.preferredUsername;
-    data.profile = identity.profile;
-    data.pronouns = identity.pronouns;
-    data.website = identity.website;
-    data.zoneInfo = identity.zoneInfo;
-  }
+    if (includes(scopes, Scope.PHONE)) {
+      data.phoneNumbers = [];
 
-  if (includes(scopes, Scope.PRIVATE)) {
-    data.connectedProviders = await getConnectedProviders(ctx, identity.id);
-    data.socialSecurityNumber = identity.socialSecurityNumber;
-    data.username = identity.username;
-  }
+      const list = await phoneNumberRepository.findMany({ identityId: identity.id });
 
-  return {
-    data,
-  };
+      for (const item of list) {
+        data.phoneNumbers.push({
+          phoneNumber: item.phoneNumber,
+          primary: item.primary,
+          verified: item.verified,
+        });
+      }
+    }
+
+    if (includes(scopes, Scope.PROFILE)) {
+      data.birthDate = identity.birthDate;
+      data.displayName = getDisplayName(identity);
+      data.familyName = identity.familyName;
+      data.gender = identity.gender;
+      data.givenName = identity.givenName;
+      data.gravatar = identity.gravatar;
+      data.locale = identity.locale;
+      data.middleName = identity.middleName;
+      data.nickname = identity.nickname;
+      data.picture = identity.picture;
+      data.preferredUsername = identity.preferredUsername;
+      data.profile = identity.profile;
+      data.pronouns = identity.pronouns;
+      data.website = identity.website;
+      data.zoneInfo = identity.zoneInfo;
+    }
+
+    if (includes(scopes, Scope.PRIVATE)) {
+      data.connectedProviders = await getConnectedProviders(ctx, identity.id);
+      data.socialSecurityNumber = identity.socialSecurityNumber;
+      data.username = identity.username;
+    }
+
+    logger.debug("identityGetController successful");
+
+    return {
+      data,
+    };
+  } catch (err: any) {
+    logger.error("identityGetController failure", err);
+
+    throw err;
+  }
 };

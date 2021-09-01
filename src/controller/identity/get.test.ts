@@ -1,5 +1,5 @@
 import { Scope } from "../../enum";
-import { getTestIdentity } from "../../test";
+import { getTestIdentity, logger } from "../../test";
 import { identityGetController } from "./get";
 
 jest.mock("../../handler", () => ({
@@ -19,6 +19,7 @@ describe("identityGetController", () => {
           id: "identityId",
         }),
       },
+      logger,
       repository: {
         emailRepository: {
           findMany: jest.fn().mockResolvedValue([

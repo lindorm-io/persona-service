@@ -1,11 +1,11 @@
 import { ClientError } from "@lindorm-io/errors";
 import { IdentifierType } from "../../enum";
+import { getTestIdentity, logger } from "../../test";
 import { identifierSetPrimaryController } from "./set-primary";
 import {
   setPrimaryEmail as _setPrimaryEmail,
   setPrimaryPhoneNumber as _setPrimaryPhoneNumber,
 } from "../../handler";
-import { getTestIdentity } from "../../test";
 
 jest.mock("../../handler", () => ({
   setPrimaryEmail: jest.fn(),
@@ -28,6 +28,7 @@ describe("identifierSetPrimaryController", () => {
       entity: {
         identity: getTestIdentity({ id: "identityId" }),
       },
+      logger,
     };
   });
 
