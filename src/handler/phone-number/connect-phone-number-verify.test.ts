@@ -1,6 +1,7 @@
 import { ClientError } from "@lindorm-io/errors";
 import { PhoneNumber } from "../../entity";
 import { connectPhoneNumberVerify } from "./connect-phone-number-verify";
+import { logger } from "../../test";
 
 jest.mock("../../instance", () => ({
   cryptoLayered: {
@@ -21,6 +22,7 @@ describe("connectPhoneNumberVerify", () => {
 
   beforeEach(() => {
     ctx = {
+      logger,
       repository: {
         phoneNumberRepository: {
           find: jest.fn().mockResolvedValue(phone1),

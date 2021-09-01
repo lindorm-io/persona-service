@@ -1,6 +1,7 @@
 import { ClientError } from "@lindorm-io/errors";
 import { Email } from "../../entity";
 import { connectEmailVerify } from "./connect-email-verify";
+import { logger } from "../../test";
 
 jest.mock("../../instance", () => ({
   cryptoLayered: {
@@ -21,6 +22,7 @@ describe("connectEmailVerify", () => {
 
   beforeEach(() => {
     ctx = {
+      logger,
       repository: {
         emailRepository: {
           find: jest.fn().mockResolvedValue(email1),

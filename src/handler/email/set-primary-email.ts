@@ -8,30 +8,41 @@ interface Options {
 
 export const setPrimaryEmail = async (ctx: Context, options: Options): Promise<void> => {
   const {
+    logger,
     repository: { emailRepository },
   } = ctx;
 
-  const { identityId, email } = options;
+  logger.debug("setPrimaryEmail", options);
 
   try {
-    const currentPrimary = await emailRepository.find({ identityId, primary: true });
+    const { identityId, email } = options;
 
-    currentPrimary.primary = false;
+    try {
+      const currentPrimary = await emailRepository.find({ identityId, primary: true });
 
-    await emailRepository.update(currentPrimary);
-  } catch (err) {
-    if (!(err instanceof EntityNotFoundError)) {
-      throw err;
+      currentPrimary.primary = false;
+
+      await emailRepository.update(currentPrimary);
+    } catch (err: any) {
+      if (!(err instanceof EntityNotFoundError)) {
+        throw err;
+      }
     }
+
+    const newPrimary = await emailRepository.find({ identityId, email });
+
+    if (newPrimary.primary) {
+      return;
+    }
+
+    newPrimary.primary = true;
+
+    await emailRepository.update(newPrimary);
+
+    logger.debug("setPrimaryEmail successful");
+  } catch (err: any) {
+    logger.error("setPrimaryEmail failure", err);
+
+    throw err;
   }
-
-  const newPrimary = await emailRepository.find({ identityId, email });
-
-  if (newPrimary.primary) {
-    return;
-  }
-
-  newPrimary.primary = true;
-
-  await emailRepository.update(newPrimary);
 };

@@ -1,6 +1,7 @@
 import { EntityNotFoundError } from "@lindorm-io/entity";
 import { Identity, OpenIdIdentifier } from "../../entity";
 import { verifyOpenIdIdentifier } from "./verify-open-id-identifier";
+import { logger } from "../../test";
 
 describe("verifyOpenIdIdentifier", () => {
   const identifier1 = new OpenIdIdentifier({
@@ -14,6 +15,7 @@ describe("verifyOpenIdIdentifier", () => {
 
   beforeEach(() => {
     ctx = {
+      logger,
       repository: {
         identityRepository: {
           create: jest.fn().mockResolvedValue(

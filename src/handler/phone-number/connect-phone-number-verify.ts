@@ -9,18 +9,33 @@ export const connectPhoneNumberVerify = async (
   code: string,
 ): Promise<void> => {
   const {
+    logger,
     repository: { phoneNumberRepository },
   } = ctx;
 
-  await cryptoLayered.assert(code, session.code);
+  logger.debug("connectPhoneNumberVerify", {
+    identifier: session.identifier,
+    sessionId: session.id,
+    type: session.type,
+  });
 
-  const entity = await phoneNumberRepository.find({ phoneNumber: session.identifier });
+  try {
+    await cryptoLayered.assert(code, session.code);
 
-  if (entity.verified) {
-    throw new ClientError("Phone number is already verified");
+    const entity = await phoneNumberRepository.find({ phoneNumber: session.identifier });
+
+    if (entity.verified) {
+      throw new ClientError("Phone number is already verified");
+    }
+
+    entity.verified = true;
+
+    await phoneNumberRepository.update(entity);
+
+    logger.debug("connectPhoneNumberVerify successful");
+  } catch (err: any) {
+    logger.error("connectPhoneNumberVerify failure", err);
+
+    throw err;
   }
-
-  entity.verified = true;
-
-  await phoneNumberRepository.update(entity);
 };

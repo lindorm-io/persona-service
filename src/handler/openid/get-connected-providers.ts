@@ -5,15 +5,28 @@ export const getConnectedProviders = async (
   identityId: string,
 ): Promise<Array<string>> => {
   const {
+    logger,
     repository: { openIdIdentifierRepository },
   } = ctx;
 
-  const array = await openIdIdentifierRepository.findMany({ identityId });
-  const list: Array<string> = [];
+  logger.debug("getConnectedProviders", {
+    identityId,
+  });
 
-  for (const item of array) {
-    list.push(item.provider);
+  try {
+    const array = await openIdIdentifierRepository.findMany({ identityId });
+    const list: Array<string> = [];
+
+    for (const item of array) {
+      list.push(item.provider);
+    }
+
+    logger.debug("getConnectedProviders successful");
+
+    return list;
+  } catch (err: any) {
+    logger.error("getConnectedProviders failure", err);
+
+    throw err;
   }
-
-  return list;
 };

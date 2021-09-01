@@ -1,5 +1,6 @@
 import { Email } from "../../entity";
 import { setPrimaryEmail } from "./set-primary-email";
+import { logger } from "../../test";
 
 describe("setPrimaryEmail", () => {
   const email1 = new Email({
@@ -20,6 +21,7 @@ describe("setPrimaryEmail", () => {
 
   beforeEach(() => {
     ctx = {
+      logger,
       repository: {
         emailRepository: {
           find: jest.fn().mockResolvedValueOnce(email1).mockResolvedValueOnce(email2),

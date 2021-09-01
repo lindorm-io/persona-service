@@ -7,16 +7,31 @@ export const userinfoUsernameAdd = async (
   identity: Identity,
 ): Promise<void> => {
   const {
+    logger,
     repository: { identityRepository },
   } = ctx;
 
-  if (!identity.preferredUsername || identity.username) return;
+  logger.debug("userinfoUsernameAdd", {
+    identityId: identity.id,
+    preferredUsername: identity.preferredUsername,
+    username: identity.username,
+  });
+
+  if (!identity.preferredUsername || identity.username) {
+    logger.debug("userinfoUsernameAdd skip");
+
+    return;
+  }
 
   try {
     identity.username = identity.preferredUsername;
 
     await identityRepository.update(identity);
-  } catch (err) {
+
+    logger.debug("userinfoUsernameAdd successful");
+  } catch (err: any) {
+    logger.debug("userinfoUsernameAdd failure", err);
+
     if (!(err instanceof EntityNotUpdatedError)) {
       throw err;
     }

@@ -11,29 +11,40 @@ export const setPrimaryPhoneNumber = async (
   options: Options,
 ): Promise<void> => {
   const {
+    logger,
     repository: { phoneNumberRepository },
   } = ctx;
 
-  const { identityId, phoneNumber } = options;
+  logger.debug("setPrimaryPhoneNumber", options);
 
   try {
-    const currentPrimary = await phoneNumberRepository.find({
-      identityId,
-      primary: true,
-    });
+    const { identityId, phoneNumber } = options;
 
-    currentPrimary.primary = false;
+    try {
+      const currentPrimary = await phoneNumberRepository.find({
+        identityId,
+        primary: true,
+      });
 
-    await phoneNumberRepository.update(currentPrimary);
-  } catch (err) {
-    if (!(err instanceof EntityNotFoundError)) {
-      throw err;
+      currentPrimary.primary = false;
+
+      await phoneNumberRepository.update(currentPrimary);
+    } catch (err: any) {
+      if (!(err instanceof EntityNotFoundError)) {
+        throw err;
+      }
     }
+
+    const newPrimary = await phoneNumberRepository.find({ identityId, phoneNumber });
+
+    newPrimary.primary = true;
+
+    await phoneNumberRepository.update(newPrimary);
+
+    logger.debug("setPrimaryPhoneNumber successful");
+  } catch (err: any) {
+    logger.error("setPrimaryPhoneNumber failure", err);
+
+    throw err;
   }
-
-  const newPrimary = await phoneNumberRepository.find({ identityId, phoneNumber });
-
-  newPrimary.primary = true;
-
-  await phoneNumberRepository.update(newPrimary);
 };

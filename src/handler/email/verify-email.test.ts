@@ -1,6 +1,7 @@
 import { EntityNotFoundError } from "@lindorm-io/entity";
 import { Identity, Email } from "../../entity";
 import { verifyEmail } from "./verify-email";
+import { logger } from "../../test";
 
 describe("verifyEmail", () => {
   const email1 = new Email({
@@ -14,6 +15,7 @@ describe("verifyEmail", () => {
 
   beforeEach(() => {
     ctx = {
+      logger,
       repository: {
         emailRepository: {
           create: jest.fn(),

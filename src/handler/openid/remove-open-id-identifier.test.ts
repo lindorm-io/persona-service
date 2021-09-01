@@ -1,5 +1,6 @@
 import { OpenIdIdentifier } from "../../entity";
 import { removeOpenIdIdentifier } from "./remove-open-id-identifier";
+import { logger } from "../../test";
 
 describe("removeOpenIdIdentifier", () => {
   const identifier1 = new OpenIdIdentifier({
@@ -13,6 +14,7 @@ describe("removeOpenIdIdentifier", () => {
 
   beforeEach(() => {
     ctx = {
+      logger,
       repository: {
         openIdIdentifierRepository: {
           find: jest.fn().mockResolvedValue(identifier1),

@@ -12,27 +12,40 @@ export const userinfoEmailAdd = async (
   options: Options,
 ): Promise<Email> => {
   const {
+    logger,
     repository: { emailRepository },
   } = ctx;
 
-  const { identityId, email } = options;
+  logger.debug("userinfoEmailAdd", options);
 
   try {
-    return await emailRepository.find({ email });
-  } catch (err) {
-    if (!(err instanceof EntityNotFoundError)) {
-      throw err;
+    const { identityId, email } = options;
+
+    try {
+      return await emailRepository.find({ email });
+    } catch (err: any) {
+      if (!(err instanceof EntityNotFoundError)) {
+        throw err;
+      }
     }
+
+    const amount = await emailRepository.count({ identityId });
+
+    const entity = await emailRepository.create(
+      new Email({
+        identityId,
+        email,
+        primary: amount < 1,
+        verified: false,
+      }),
+    );
+
+    logger.debug("userinfoEmailAdd successful");
+
+    return entity;
+  } catch (err: any) {
+    logger.error("userinfoEmailAdd failure", err);
+
+    throw err;
   }
-
-  const amount = await emailRepository.count({ identityId });
-
-  return await emailRepository.create(
-    new Email({
-      identityId,
-      email,
-      primary: amount < 1,
-      verified: false,
-    }),
-  );
 };

@@ -1,5 +1,6 @@
 import { getTestDisplayName, getTestIdentity } from "../../test";
 import { updateIdentityDisplayName } from "./update-identity-display-name";
+import { logger } from "../../test";
 
 jest.mock("@lindorm-io/core", () => ({
   ...(jest.requireActual("@lindorm-io/core") as object),
@@ -12,24 +13,21 @@ describe("updateIdentityDisplayName", () => {
 
   beforeEach(() => {
     ctx = {
+      logger,
       repository: {
         displayNameRepository: {
-          find: jest
-            .fn()
-            .mockImplementation(async (options) =>
-              getTestDisplayName({
-                numbers: [1234, 2345, 3456, 4567, 5678, 6789],
-                ...options,
-              }),
-            ),
-          findOrCreate: jest
-            .fn()
-            .mockImplementation(async (options) =>
-              getTestDisplayName({
-                numbers: [1234, 2345, 3456, 4567, 5678, 6789],
-                ...options,
-              }),
-            ),
+          find: jest.fn().mockImplementation(async (options) =>
+            getTestDisplayName({
+              numbers: [1234, 2345, 3456, 4567, 5678, 6789],
+              ...options,
+            }),
+          ),
+          findOrCreate: jest.fn().mockImplementation(async (options) =>
+            getTestDisplayName({
+              numbers: [1234, 2345, 3456, 4567, 5678, 6789],
+              ...options,
+            }),
+          ),
           update: jest.fn(),
         },
       },

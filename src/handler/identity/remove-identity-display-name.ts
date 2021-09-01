@@ -6,18 +6,31 @@ export const removeIdentityDisplayName = async (
   identity: Identity,
 ): Promise<void> => {
   const {
+    logger,
     repository: { displayNameRepository },
   } = ctx;
 
-  if (!identity.displayName.name) {
-    return;
-  }
-
-  const entity = await displayNameRepository.find({
-    name: identity.displayName.name,
+  logger.debug("removeIdentityDisplayName", {
+    identityId: identity.id,
   });
 
-  entity.remove(identity.displayName.number);
+  try {
+    if (!identity.displayName.name) {
+      return;
+    }
 
-  await displayNameRepository.update(entity);
+    const entity = await displayNameRepository.find({
+      name: identity.displayName.name,
+    });
+
+    entity.remove(identity.displayName.number);
+
+    await displayNameRepository.update(entity);
+
+    logger.debug("removeIdentityDisplayName successful");
+  } catch (err: any) {
+    logger.error("removeIdentityDisplayName failure");
+
+    throw err;
+  }
 };

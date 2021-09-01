@@ -19,51 +19,62 @@ export const connectEmailInitialise = async (
   const {
     axios: { communicationClient },
     cache: { connectSessionCache },
+    logger,
     repository: { emailRepository },
   } = ctx;
 
-  const { identityId, email } = options;
-
-  let entity: Email;
+  logger.debug("connectEmailInitialise", options);
 
   try {
-    entity = await emailRepository.find({ email });
-  } catch (err) {
-    if (!(err instanceof EntityNotFoundError)) {
-      throw err;
+    const { identityId, email } = options;
+
+    let entity: Email;
+
+    try {
+      entity = await emailRepository.find({ email });
+    } catch (err: any) {
+      if (!(err instanceof EntityNotFoundError)) {
+        throw err;
+      }
+
+      entity = await emailRepository.create(
+        new Email({
+          identityId,
+          email,
+          primary: false,
+          verified: false,
+        }),
+      );
     }
 
-    entity = await emailRepository.create(
-      new Email({
-        identityId,
-        email,
-        primary: false,
-        verified: false,
+    if (entity.verified) {
+      throw new ClientError("Email is already verified");
+    }
+
+    const expiresIn = stringToSeconds(config.EXPIRY_CONNECT_IDENTIFIER_SESSION);
+    const code = getRandomValue(128);
+
+    const session = await connectSessionCache.create(
+      new ConnectSession({
+        code: await cryptoLayered.encrypt(code),
+        identifier: entity.email,
+        type: IdentifierType.EMAIL,
       }),
+      expiresIn,
     );
+
+    await communicationClient.post("/private/connect-email", {
+      data: {
+        code,
+        email: entity.email,
+        session: session.id,
+      },
+    });
+
+    logger.debug("connectEmailInitialise successful");
+  } catch (err: any) {
+    logger.error("connectEmailInitialise failure");
+
+    throw err;
   }
-
-  if (entity.verified) {
-    throw new ClientError("Email is already verified");
-  }
-
-  const expiresIn = stringToSeconds(config.EXPIRY_CONNECT_IDENTIFIER_SESSION);
-  const code = getRandomValue(128);
-
-  const session = await connectSessionCache.create(
-    new ConnectSession({
-      code: await cryptoLayered.encrypt(code),
-      identifier: entity.email,
-      type: IdentifierType.EMAIL,
-    }),
-    expiresIn,
-  );
-
-  await communicationClient.post("/private/connect-email", {
-    data: {
-      code,
-      email: entity.email,
-      session: session.id,
-    },
-  });
 };

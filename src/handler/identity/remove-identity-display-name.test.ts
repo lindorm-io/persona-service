@@ -1,11 +1,13 @@
 import { getTestDisplayName, getTestIdentity } from "../../test";
 import { removeIdentityDisplayName } from "./remove-identity-display-name";
+import { logger } from "../../test";
 
 describe("removeIdentityDisplayName", () => {
   let ctx: any;
 
   beforeEach(() => {
     ctx = {
+      logger,
       repository: {
         displayNameRepository: {
           find: jest.fn().mockResolvedValue(

@@ -8,16 +8,27 @@ interface Options {
 
 export const removeEmail = async (ctx: Context, options: Options): Promise<void> => {
   const {
+    logger,
     repository: { emailRepository },
   } = ctx;
 
-  const { identityId, email } = options;
+  logger.debug("removeEmail", options);
 
-  const entity = await emailRepository.find({ identityId, email });
+  try {
+    const { identityId, email } = options;
 
-  if (entity.primary) {
-    throw new ClientError("Unable to remove primary email");
+    const entity = await emailRepository.find({ identityId, email });
+
+    if (entity.primary) {
+      throw new ClientError("Unable to remove primary email");
+    }
+
+    await emailRepository.remove(entity);
+
+    logger.debug("removeEmail successful");
+  } catch (err: any) {
+    logger.error("removeEmail failure", err);
+
+    throw err;
   }
-
-  await emailRepository.remove(entity);
 };

@@ -1,12 +1,14 @@
 import { userinfoUsernameAdd } from "./userinfo-username-add";
 import { Identity } from "../../entity";
 import { EntityNotUpdatedError } from "@lindorm-io/entity";
+import { logger } from "../../test";
 
 describe("userinfoUsernameAdd", () => {
   let ctx: any;
 
   beforeEach(() => {
     ctx = {
+      logger,
       repository: {
         identityRepository: {
           update: jest.fn(),

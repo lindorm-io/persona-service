@@ -1,6 +1,7 @@
 import { EntityNotFoundError } from "@lindorm-io/entity";
 import { Identity, PhoneNumber } from "../../entity";
 import { verifyPhoneNumber } from "./verify-phone-number";
+import { logger } from "../../test";
 
 describe("verifyPhoneNumber", () => {
   const phone1 = new PhoneNumber({
@@ -14,6 +15,7 @@ describe("verifyPhoneNumber", () => {
 
   beforeEach(() => {
     ctx = {
+      logger,
       repository: {
         phoneNumberRepository: {
           create: jest.fn(),

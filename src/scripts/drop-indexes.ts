@@ -16,7 +16,7 @@ import { winston } from "../logger";
         }
       },
     );
-  } catch (err) {
+  } catch (err: any) {
     winston.error("error", err);
   } finally {
     process.exit(0);

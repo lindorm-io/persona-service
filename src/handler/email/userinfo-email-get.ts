@@ -20,6 +20,10 @@ export const userinfoEmailGet = async (
     repository: { emailRepository },
   } = ctx;
 
+  logger.debug("userinfoEmailGet", {
+    identityId,
+  });
+
   try {
     const array = await emailRepository.findMany({ identityId });
     const ordered = orderBy(
@@ -32,12 +36,14 @@ export const userinfoEmailGet = async (
 
     const { email, verified } = ordered[0];
 
+    logger.debug("userinfoEmailGet successful");
+
     return {
       email,
       emailVerified: verified,
     };
-  } catch (err) {
-    logger.error("Error finding email for userinfo", err);
+  } catch (err: any) {
+    logger.error("userinfoEmailGet failure", err);
 
     return EMPTY;
   }

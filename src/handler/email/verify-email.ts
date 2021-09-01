@@ -4,29 +4,42 @@ import { EntityNotFoundError } from "@lindorm-io/entity";
 
 export const verifyEmail = async (ctx: Context, email: string): Promise<Identity> => {
   const {
+    logger,
     repository: { identityRepository, emailRepository },
   } = ctx;
 
+  logger.debug("verifyEmail", {
+    email,
+  });
+
   try {
-    const entity = await emailRepository.find({ email });
+    try {
+      const entity = await emailRepository.find({ email });
 
-    return await identityRepository.find({ id: entity.identityId });
-  } catch (err) {
-    if (!(err instanceof EntityNotFoundError)) {
-      throw err;
+      return await identityRepository.find({ id: entity.identityId });
+    } catch (err: any) {
+      if (!(err instanceof EntityNotFoundError)) {
+        throw err;
+      }
+
+      const identity = await identityRepository.create(new Identity({}));
+
+      await emailRepository.create(
+        new Email({
+          email,
+          identityId: identity.id,
+          primary: true,
+          verified: true,
+        }),
+      );
+
+      logger.debug("verifyEmail successful");
+
+      return identity;
     }
+  } catch (err: any) {
+    logger.error("verifyEmail failure", err);
 
-    const identity = await identityRepository.create(new Identity({}));
-
-    await emailRepository.create(
-      new Email({
-        email,
-        identityId: identity.id,
-        primary: true,
-        verified: true,
-      }),
-    );
-
-    return identity;
+    throw err;
   }
 };

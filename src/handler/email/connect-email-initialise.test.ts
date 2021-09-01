@@ -3,6 +3,7 @@ import { ClientError } from "@lindorm-io/errors";
 import { EntityNotFoundError } from "@lindorm-io/entity";
 import { Email } from "../../entity";
 import { connectEmailInitialise } from "./connect-email-initialise";
+import { logger } from "../../test";
 
 MockDate.set("2021-01-01T08:00:00.000Z");
 
@@ -34,6 +35,7 @@ describe("connectEmailInitialise", () => {
           create: jest.fn().mockImplementation(async (entity: any) => entity),
         },
       },
+      logger,
       repository: {
         emailRepository: {
           find: jest.fn().mockResolvedValue(email1),

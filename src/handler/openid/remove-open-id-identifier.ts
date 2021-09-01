@@ -10,12 +10,23 @@ export const removeOpenIdIdentifier = async (
   options: Options,
 ): Promise<void> => {
   const {
+    logger,
     repository: { openIdIdentifierRepository },
   } = ctx;
 
-  const { identityId, identifier } = options;
+  logger.debug("removeOpenIdIdentifier", options);
 
-  const entity = await openIdIdentifierRepository.find({ identityId, identifier });
+  try {
+    const { identityId, identifier } = options;
 
-  await openIdIdentifierRepository.remove(entity);
+    const entity = await openIdIdentifierRepository.find({ identityId, identifier });
+
+    await openIdIdentifierRepository.remove(entity);
+
+    logger.debug("removeOpenIdIdentifier successful");
+  } catch (err: any) {
+    logger.error("removeOpenIdIdentifier failure", err);
+
+    throw err;
+  }
 };

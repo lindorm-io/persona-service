@@ -20,8 +20,11 @@ export const userinfoPhoneNumberGet = async (
     repository: { phoneNumberRepository },
   } = ctx;
 
+  logger.debug("userinfoPhoneNumberGet", { identityId });
+
   try {
     const array = await phoneNumberRepository.findMany({ identityId });
+
     const ordered = orderBy(
       array,
       ["verified", "primary", "updated"],
@@ -32,12 +35,14 @@ export const userinfoPhoneNumberGet = async (
 
     const { phoneNumber, verified } = ordered[0];
 
+    logger.debug("userinfoPhoneNumberGet successful");
+
     return {
       phoneNumber,
       phoneNumberVerified: verified,
     };
-  } catch (err) {
-    logger.error("Error finding phone number for userinfo", err);
+  } catch (err: any) {
+    logger.error("userinfoPhoneNumberGet failure", err);
 
     return EMPTY;
   }

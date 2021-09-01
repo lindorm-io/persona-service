@@ -12,30 +12,41 @@ export const verifyOpenIdIdentifier = async (
   options: Options,
 ): Promise<Identity> => {
   const {
+    logger,
     repository: { identityRepository, openIdIdentifierRepository },
   } = ctx;
 
-  const { identifier, provider } = options;
+  logger.debug("verifyOpenIdIdentifier", options);
 
   try {
-    const entity = await openIdIdentifierRepository.find({ identifier, provider });
+    const { identifier, provider } = options;
 
-    return await identityRepository.find({ id: entity.identityId });
-  } catch (err) {
-    if (!(err instanceof EntityNotFoundError)) {
-      throw err;
+    try {
+      const entity = await openIdIdentifierRepository.find({ identifier, provider });
+
+      return await identityRepository.find({ id: entity.identityId });
+    } catch (err: any) {
+      if (!(err instanceof EntityNotFoundError)) {
+        throw err;
+      }
+
+      const identity = await identityRepository.create(new Identity({}));
+
+      await openIdIdentifierRepository.create(
+        new OpenIdIdentifier({
+          identityId: identity.id,
+          identifier,
+          provider,
+        }),
+      );
+
+      logger.debug("verifyOpenIdIdentifier successful");
+
+      return identity;
     }
+  } catch (err: any) {
+    logger.error("verifyOpenIdIdentifier failure", err);
 
-    const identity = await identityRepository.create(new Identity({}));
-
-    await openIdIdentifierRepository.create(
-      new OpenIdIdentifier({
-        identityId: identity.id,
-        identifier,
-        provider,
-      }),
-    );
-
-    return identity;
+    throw err;
   }
 };

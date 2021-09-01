@@ -1,6 +1,7 @@
 import { OpenIdIdentifier } from "../../entity";
 import { userinfoOpenIdIdentifierAdd } from "./userinfo-open-id-identifier-add";
 import { EntityNotFoundError } from "@lindorm-io/entity";
+import { logger } from "../../test";
 
 describe("userinfoOpenIdIdentifierAdd", () => {
   const identifier1 = new OpenIdIdentifier({
@@ -14,6 +15,7 @@ describe("userinfoOpenIdIdentifierAdd", () => {
 
   beforeEach(() => {
     ctx = {
+      logger,
       repository: {
         openIdIdentifierRepository: {
           create: jest.fn().mockImplementation(async (entity: any) => entity),

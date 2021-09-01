@@ -12,27 +12,40 @@ export const userinfoPhoneNumberAdd = async (
   options: Options,
 ): Promise<PhoneNumber> => {
   const {
+    logger,
     repository: { phoneNumberRepository },
   } = ctx;
 
-  const { identityId, phoneNumber } = options;
+  logger.debug("userinfoPhoneNumberAdd", options);
 
   try {
-    return await phoneNumberRepository.find({ phoneNumber });
-  } catch (err) {
-    if (!(err instanceof EntityNotFoundError)) {
-      throw err;
+    const { identityId, phoneNumber } = options;
+
+    try {
+      return await phoneNumberRepository.find({ phoneNumber });
+    } catch (err: any) {
+      if (!(err instanceof EntityNotFoundError)) {
+        throw err;
+      }
     }
+
+    const amount = await phoneNumberRepository.count({ identityId });
+
+    const entity = await phoneNumberRepository.create(
+      new PhoneNumber({
+        identityId,
+        phoneNumber,
+        primary: amount < 1,
+        verified: false,
+      }),
+    );
+
+    logger.debug("userinfoPhoneNumberAdd successful");
+
+    return entity;
+  } catch (err: any) {
+    logger.error("userinfoPhoneNumberAdd failure", err);
+
+    throw err;
   }
-
-  const amount = await phoneNumberRepository.count({ identityId });
-
-  return await phoneNumberRepository.create(
-    new PhoneNumber({
-      identityId,
-      phoneNumber,
-      primary: amount < 1,
-      verified: false,
-    }),
-  );
 };
