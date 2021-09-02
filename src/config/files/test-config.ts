@@ -20,11 +20,9 @@ export const testConfig: Configuration = {
   EXPIRY_CONNECT_IDENTIFIER_SESSION: "2 hours",
 
   // Services
-  AUTHENTICATION_SERVICE_HOST: "https://authentication.test.api.lindorm.io",
   COMMUNICATION_SERVICE_HOST: "https://communication.test.api.lindorm.io",
   COMMUNICATION_SERVICE_USERNAME: "secret",
   COMMUNICATION_SERVICE_PASSWORD: "secret",
-  OAUTH_SERVICE_HOST: "https://oauth.test.api.lindorm.io",
 
   // Redis
   REDIS_HOST: "localhost",

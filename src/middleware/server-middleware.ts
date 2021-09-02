@@ -68,6 +68,6 @@ export const serverMiddlewares = [
   cacheKeysMiddleware,
   keystoreMiddleware,
   tokenIssuerMiddleware({
-    issuer: config.OAUTH_SERVICE_HOST,
+    issuer: config.BEARER_TOKEN_ISSUER,
   }),
 ];

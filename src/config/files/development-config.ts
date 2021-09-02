@@ -20,11 +20,9 @@ export const developmentConfig: Configuration = {
   EXPIRY_CONNECT_IDENTIFIER_SESSION: "2 hours",
 
   // Services
-  AUTHENTICATION_SERVICE_HOST: "http://localhost:3005",
   COMMUNICATION_SERVICE_HOST: "http://localhost:3009",
   COMMUNICATION_SERVICE_USERNAME: "secret",
   COMMUNICATION_SERVICE_PASSWORD: "secret",
-  OAUTH_SERVICE_HOST: "http://localhost:3004",
 
   // Redis
   REDIS_HOST: "localhost",

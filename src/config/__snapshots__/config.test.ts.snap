@@ -29,7 +29,6 @@ Object {
     "type": "CACHE",
   },
   "config": Object {
-    "AUTHENTICATION_SERVICE_HOST": "https://authentication.test.api.lindorm.io",
     "BASIC_AUTH_PASSWORD": "secret",
     "BASIC_AUTH_USERNAME": "secret",
     "BEARER_TOKEN_ISSUER": "https://oauth.test.api.lindorm.io",
@@ -46,7 +45,6 @@ Object {
     "MONGO_PORT": 27017,
     "MONGO_USERNAME": "secret",
     "NODE_ENVIRONMENT": "test",
-    "OAUTH_SERVICE_HOST": "https://oauth.test.api.lindorm.io",
     "REDIS_HOST": "localhost",
     "REDIS_PASSWORD": "secret",
     "REDIS_PORT": 6379,

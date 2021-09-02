@@ -19,11 +19,9 @@ export interface Configuration extends DefaultConfiguration {
   EXPIRY_CONNECT_IDENTIFIER_SESSION: string;
 
   // Services
-  AUTHENTICATION_SERVICE_HOST: string;
   COMMUNICATION_SERVICE_HOST: string;
   COMMUNICATION_SERVICE_USERNAME: string;
   COMMUNICATION_SERVICE_PASSWORD: string;
-  OAUTH_SERVICE_HOST: string;
 
   // Redis
   REDIS_HOST: string;

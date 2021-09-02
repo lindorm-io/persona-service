@@ -20,11 +20,9 @@ export const stagingConfig: Configuration = {
   EXPIRY_CONNECT_IDENTIFIER_SESSION: "2 hours",
 
   // Services
-  AUTHENTICATION_SERVICE_HOST: "https://authentication.staging.api.lindorm.io",
   COMMUNICATION_SERVICE_HOST: "https://communication.staging.api.lindorm.io",
   COMMUNICATION_SERVICE_USERNAME: null,
   COMMUNICATION_SERVICE_PASSWORD: null,
-  OAUTH_SERVICE_HOST: "https://oauth.staging.api.lindorm.io",
 
   // Redis
   REDIS_HOST: null,
