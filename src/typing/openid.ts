@@ -50,3 +50,8 @@ export interface IdentityServiceClaims {
   socialSecurityNumber: string;
   username: string;
 }
+
+export type ScopeHint = Record<
+  string,
+  Array<Partial<keyof OpenIDClaims | keyof IdentityServiceClaims>>
+>;

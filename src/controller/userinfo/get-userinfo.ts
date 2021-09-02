@@ -1,7 +1,7 @@
 import Joi from "joi";
-import { Context, IdentityServiceClaims, OpenIDClaims } from "../../typing";
+import { Context, IdentityServiceClaims, ScopeHint, OpenIDClaims } from "../../typing";
 import { Controller, ControllerResponse } from "@lindorm-io/koa";
-import { JOI_GUID } from "../../constant";
+import { JOI_GUID, SCOPE_HINT } from "../../constant";
 import { TokenIssuer } from "@lindorm-io/jwt";
 import { getAddress, getDisplayName, getName } from "../../util";
 import { userinfoEmailGet, userinfoPhoneNumberGet } from "../../handler";
@@ -10,7 +10,7 @@ interface RequestData {
   id: string;
 }
 
-type ResponseData = OpenIDClaims & IdentityServiceClaims;
+type ResponseData = OpenIDClaims & IdentityServiceClaims & { scopeHint: ScopeHint };
 
 export const userinfoGetSchema = Joi.object<RequestData>({
   id: JOI_GUID.required(),
@@ -66,6 +66,7 @@ export const userinfoGetController: Controller<Context<RequestData>> = async (
         // always
         sub: id,
         updatedAt: TokenIssuer.getUnixTime(updated),
+        scopeHint: SCOPE_HINT,
 
         // address
         address,
@@ -90,7 +91,6 @@ export const userinfoGetController: Controller<Context<RequestData>> = async (
         name,
         nickname,
         picture,
-        preferredAccessibility,
         preferredUsername,
         profile,
         pronouns,
@@ -98,6 +98,7 @@ export const userinfoGetController: Controller<Context<RequestData>> = async (
         zoneInfo,
 
         // private
+        preferredAccessibility,
         socialSecurityNumber,
         username,
       },

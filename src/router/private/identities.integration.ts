@@ -1,5 +1,6 @@
 import MockDate from "mockdate";
 import request from "supertest";
+import { SCOPE_HINT } from "../../constant";
 import { koa } from "../../server/koa";
 import { v4 as uuid } from "uuid";
 import {
@@ -63,6 +64,7 @@ describe("/private/identities", () => {
       preferred_username: "username",
       profile: "https://profile.url/",
       pronouns: "she/her",
+      scope_hint: SCOPE_HINT,
       social_security_number: "198412301545",
       sub: identity.id,
       updated_at: 1609488000,

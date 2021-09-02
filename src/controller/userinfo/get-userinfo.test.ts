@@ -1,5 +1,6 @@
 import { getTestIdentity, logger } from "../../test";
 import { userinfoGetController } from "./get-userinfo";
+import { SCOPE_HINT } from "../../constant";
 
 jest.mock("../../handler", () => ({
   userinfoEmailGet: jest.fn().mockResolvedValue({
@@ -56,6 +57,7 @@ describe("userinfoGetController", () => {
         preferredUsername: "username",
         profile: "https://profile.url/",
         pronouns: "she/her",
+        scopeHint: SCOPE_HINT,
         socialSecurityNumber: "198412301545",
         sub: "id",
         updatedAt: 1609488000,
