@@ -9,33 +9,18 @@ export const connectEmailVerify = async (
   code: string,
 ): Promise<void> => {
   const {
-    logger,
     repository: { emailRepository },
   } = ctx;
 
-  logger.debug("connectEmailVerify", {
-    identifier: session.identifier,
-    sessionId: session.id,
-    type: session.type,
-  });
+  await cryptoLayered.assert(code, session.code);
 
-  try {
-    await cryptoLayered.assert(code, session.code);
+  const entity = await emailRepository.find({ email: session.identifier });
 
-    const entity = await emailRepository.find({ email: session.identifier });
-
-    if (entity.verified) {
-      throw new ClientError("Email is already verified");
-    }
-
-    entity.verified = true;
-
-    await emailRepository.update(entity);
-
-    logger.debug("connectEmailVerify successful");
-  } catch (err: any) {
-    logger.error("connectEmailVerify failure");
-
-    throw err;
+  if (entity.verified) {
+    throw new ClientError("Email is already verified");
   }
+
+  entity.verified = true;
+
+  await emailRepository.update(entity);
 };

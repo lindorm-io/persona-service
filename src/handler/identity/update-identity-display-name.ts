@@ -7,42 +7,28 @@ export const updateIdentityDisplayName = async (
   displayName: string,
 ): Promise<void> => {
   const {
-    logger,
     repository: { displayNameRepository },
   } = ctx;
 
-  logger.debug("updateIdentityDisplayName", {
-    identityId: identity.id,
-    displayName,
-  });
+  if (identity.displayName.name) {
+    const current = await displayNameRepository.find({
+      name: identity.displayName.name,
+    });
 
-  try {
-    if (identity.displayName.name) {
-      const current = await displayNameRepository.find({
-        name: identity.displayName.name,
-      });
+    current.remove(identity.displayName.number);
 
-      current.remove(identity.displayName.number);
-
-      await displayNameRepository.update(current);
-    }
-
-    const entity = await displayNameRepository.findOrCreate({ name: displayName });
-    const number = await entity.generateNumber();
-
-    entity.add(number);
-
-    await displayNameRepository.update(entity);
-
-    identity.displayName = {
-      name: displayName,
-      number,
-    };
-
-    logger.debug("updateIdentityDisplayName successful");
-  } catch (err: any) {
-    logger.error("updateIdentityDisplayName failure");
-
-    throw err;
+    await displayNameRepository.update(current);
   }
+
+  const entity = await displayNameRepository.findOrCreate({ name: displayName });
+  const number = await entity.generateNumber();
+
+  entity.add(number);
+
+  await displayNameRepository.update(entity);
+
+  identity.displayName = {
+    name: displayName,
+    number,
+  };
 };

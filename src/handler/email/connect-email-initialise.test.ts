@@ -1,9 +1,9 @@
 import MockDate from "mockdate";
 import { ClientError } from "@lindorm-io/errors";
+import { ConnectSession, Email } from "../../entity";
 import { EntityNotFoundError } from "@lindorm-io/entity";
-import { Email } from "../../entity";
 import { connectEmailInitialise } from "./connect-email-initialise";
-import { logger } from "../../test";
+import { getTestIdentity, logger } from "../../test";
 
 MockDate.set("2021-01-01T08:00:00.000Z");
 
@@ -21,7 +21,7 @@ describe("connectEmailInitialise", () => {
   });
 
   let ctx: any;
-  let options: any;
+  let identity: any;
 
   beforeEach(() => {
     ctx = {
@@ -43,14 +43,14 @@ describe("connectEmailInitialise", () => {
         },
       },
     };
-    options = {
-      identityId: "identityId",
-      email: "email",
-    };
+
+    identity = getTestIdentity();
   });
 
   test("should initialise connection for existing email", async () => {
-    await expect(connectEmailInitialise(ctx, options)).resolves.toBeUndefined();
+    await expect(connectEmailInitialise(ctx, identity, "email")).resolves.toStrictEqual(
+      expect.any(ConnectSession),
+    );
 
     expect(ctx.cache.connectSessionCache.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -62,12 +62,14 @@ describe("connectEmailInitialise", () => {
     );
 
     expect(ctx.axios.communicationClient.post).toHaveBeenCalledWith(
-      "/private/connect-email",
+      "/private/send/email",
       {
         data: {
-          code: expect.any(String),
+          code: expect.any(Number),
           email: "email1",
-          session: "93aea58b-f3de-44fe-b7de-8db0dd97117b",
+          expiresIn: 7200,
+          name: "givenName familyName",
+          template: "connect-email",
         },
       },
     );
@@ -78,7 +80,9 @@ describe("connectEmailInitialise", () => {
       new EntityNotFoundError("message"),
     );
 
-    await expect(connectEmailInitialise(ctx, options)).resolves.toBeUndefined();
+    await expect(connectEmailInitialise(ctx, identity, "email")).resolves.toStrictEqual(
+      expect.any(ConnectSession),
+    );
 
     expect(ctx.cache.connectSessionCache.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -90,12 +94,14 @@ describe("connectEmailInitialise", () => {
     );
 
     expect(ctx.axios.communicationClient.post).toHaveBeenCalledWith(
-      "/private/connect-email",
+      "/private/send/email",
       {
         data: {
-          code: expect.any(String),
+          code: expect.any(Number),
           email: "email",
-          session: "93aea58b-f3de-44fe-b7de-8db0dd97117b",
+          expiresIn: 7200,
+          name: "givenName familyName",
+          template: "connect-email",
         },
       },
     );
@@ -104,6 +110,8 @@ describe("connectEmailInitialise", () => {
   test("should throw if email is already verified", async () => {
     email1.verified = true;
 
-    await expect(connectEmailInitialise(ctx, options)).rejects.toThrow(ClientError);
+    await expect(connectEmailInitialise(ctx, identity, "email")).rejects.toThrow(
+      ClientError,
+    );
   });
 });

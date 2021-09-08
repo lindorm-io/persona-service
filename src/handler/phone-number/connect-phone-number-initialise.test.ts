@@ -1,9 +1,9 @@
 import MockDate from "mockdate";
 import { ClientError } from "@lindorm-io/errors";
+import { ConnectSession, PhoneNumber } from "../../entity";
 import { EntityNotFoundError } from "@lindorm-io/entity";
-import { PhoneNumber } from "../../entity";
 import { connectPhoneNumberInitialise } from "./connect-phone-number-initialise";
-import { logger } from "../../test";
+import { getTestIdentity, logger } from "../../test";
 
 MockDate.set("2021-01-01T08:00:00.000Z");
 
@@ -21,7 +21,7 @@ describe("connectPhoneNumberInitialise", () => {
   });
 
   let ctx: any;
-  let options: any;
+  let identity: any;
 
   beforeEach(() => {
     ctx = {
@@ -43,14 +43,14 @@ describe("connectPhoneNumberInitialise", () => {
         },
       },
     };
-    options = {
-      identityId: "identityId",
-      phoneNumber: "phoneNumber",
-    };
+
+    identity = getTestIdentity();
   });
 
   test("should initialise connection for existing phone number", async () => {
-    await expect(connectPhoneNumberInitialise(ctx, options)).resolves.toBeUndefined();
+    await expect(
+      connectPhoneNumberInitialise(ctx, identity, "phoneNumber"),
+    ).resolves.toStrictEqual(expect.any(ConnectSession));
 
     expect(ctx.cache.connectSessionCache.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -61,16 +61,15 @@ describe("connectPhoneNumberInitialise", () => {
       7200,
     );
 
-    expect(ctx.axios.communicationClient.post).toHaveBeenCalledWith(
-      "/private/connect-phone-number",
-      {
-        data: {
-          code: expect.any(String),
-          phoneNumber: "phoneNumber1",
-          session: "93aea58b-f3de-44fe-b7de-8db0dd97117b",
-        },
+    expect(ctx.axios.communicationClient.post).toHaveBeenCalledWith("/private/send/sms", {
+      data: {
+        code: expect.any(Number),
+        expiresIn: 7200,
+        name: "givenName familyName",
+        phoneNumber: "phoneNumber1",
+        template: "connect-phone-number",
       },
-    );
+    });
   });
 
   test("should initialise connection for new phone number", async () => {
@@ -78,7 +77,9 @@ describe("connectPhoneNumberInitialise", () => {
       new EntityNotFoundError("message"),
     );
 
-    await expect(connectPhoneNumberInitialise(ctx, options)).resolves.toBeUndefined();
+    await expect(
+      connectPhoneNumberInitialise(ctx, identity, "phoneNumber"),
+    ).resolves.toStrictEqual(expect.any(ConnectSession));
 
     expect(ctx.cache.connectSessionCache.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -89,21 +90,22 @@ describe("connectPhoneNumberInitialise", () => {
       7200,
     );
 
-    expect(ctx.axios.communicationClient.post).toHaveBeenCalledWith(
-      "/private/connect-phone-number",
-      {
-        data: {
-          code: expect.any(String),
-          phoneNumber: "phoneNumber",
-          session: "93aea58b-f3de-44fe-b7de-8db0dd97117b",
-        },
+    expect(ctx.axios.communicationClient.post).toHaveBeenCalledWith("/private/send/sms", {
+      data: {
+        code: expect.any(Number),
+        expiresIn: 7200,
+        name: "givenName familyName",
+        phoneNumber: "phoneNumber",
+        template: "connect-phone-number",
       },
-    );
+    });
   });
 
   test("should throw if phone number is already verified", async () => {
     phone1.verified = true;
 
-    await expect(connectPhoneNumberInitialise(ctx, options)).rejects.toThrow(ClientError);
+    await expect(
+      connectPhoneNumberInitialise(ctx, identity, "phoneNumber"),
+    ).rejects.toThrow(ClientError);
   });
 });

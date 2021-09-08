@@ -53,46 +53,35 @@ export const identifierRemoveController: Controller<Context<RequestData>> = asyn
   const {
     data: { email, identifier, phoneNumber, type },
     entity: { identity },
-    logger,
   } = ctx;
 
-  logger.debug("identifierRemoveController", ctx.data);
+  switch (type) {
+    case IdentifierType.EMAIL:
+      await removeEmail(ctx, {
+        identityId: identity.id,
+        email,
+      });
+      break;
 
-  try {
-    switch (type) {
-      case IdentifierType.EMAIL:
-        await removeEmail(ctx, {
-          identityId: identity.id,
-          email,
-        });
-        break;
+    case IdentifierType.PHONE_NUMBER:
+      await removePhoneNumber(ctx, {
+        identityId: identity.id,
+        phoneNumber,
+      });
+      break;
 
-      case IdentifierType.PHONE_NUMBER:
-        await removePhoneNumber(ctx, {
-          identityId: identity.id,
-          phoneNumber,
-        });
-        break;
+    case IdentifierType.OIDC:
+      await removeOpenIdIdentifier(ctx, {
+        identityId: identity.id,
+        identifier,
+      });
+      break;
 
-      case IdentifierType.OIDC:
-        await removeOpenIdIdentifier(ctx, {
-          identityId: identity.id,
-          identifier,
-        });
-        break;
-
-      default:
-        throw new ClientError("Unexpected identifier type");
-    }
-
-    logger.debug("identifierRemoveController successful");
-
-    return {
-      data: {},
-    };
-  } catch (err: any) {
-    logger.error("identifierRemoveController failure", err);
-
-    throw err;
+    default:
+      throw new ClientError("Unexpected identifier type");
   }
+
+  return {
+    data: {},
+  };
 };

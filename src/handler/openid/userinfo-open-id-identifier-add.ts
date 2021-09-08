@@ -13,37 +13,24 @@ export const userinfoOpenIdIdentifierAdd = async (
   options: Options,
 ): Promise<OpenIdIdentifier> => {
   const {
-    logger,
     repository: { openIdIdentifierRepository },
   } = ctx;
 
-  logger.debug("userinfoOpenIdIdentifierAdd", options);
+  const { identityId, identifier, provider } = options;
 
   try {
-    const { identityId, identifier, provider } = options;
-
-    try {
-      return await openIdIdentifierRepository.find({ identifier, provider });
-    } catch (err: any) {
-      if (!(err instanceof EntityNotFoundError)) {
-        throw err;
-      }
-    }
-
-    const entity = await openIdIdentifierRepository.create(
-      new OpenIdIdentifier({
-        identityId,
-        identifier,
-        provider,
-      }),
-    );
-
-    logger.debug("userinfoOpenIdIdentifierAdd successful");
-
-    return entity;
+    return await openIdIdentifierRepository.find({ identifier, provider });
   } catch (err: any) {
-    logger.debug("userinfoOpenIdIdentifierAdd failure", err);
-
-    throw err;
+    if (!(err instanceof EntityNotFoundError)) {
+      throw err;
+    }
   }
+
+  return await openIdIdentifierRepository.create(
+    new OpenIdIdentifier({
+      identityId,
+      identifier,
+      provider,
+    }),
+  );
 };

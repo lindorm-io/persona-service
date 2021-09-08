@@ -16,11 +16,8 @@ export const userinfoPhoneNumberGet = async (
   identityId: string,
 ): Promise<Result> => {
   const {
-    logger,
     repository: { phoneNumberRepository },
   } = ctx;
-
-  logger.debug("userinfoPhoneNumberGet", { identityId });
 
   try {
     const array = await phoneNumberRepository.findMany({ identityId });
@@ -35,15 +32,11 @@ export const userinfoPhoneNumberGet = async (
 
     const { phoneNumber, verified } = ordered[0];
 
-    logger.debug("userinfoPhoneNumberGet successful");
-
     return {
       phoneNumber,
       phoneNumberVerified: verified,
     };
   } catch (err: any) {
-    logger.error("userinfoPhoneNumberGet failure", err);
-
     return EMPTY;
   }
 };

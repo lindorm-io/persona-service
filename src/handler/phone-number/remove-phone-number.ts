@@ -11,27 +11,16 @@ export const removePhoneNumber = async (
   options: Options,
 ): Promise<void> => {
   const {
-    logger,
     repository: { phoneNumberRepository },
   } = ctx;
 
-  logger.debug("removePhoneNumber", options);
+  const { identityId, phoneNumber } = options;
 
-  try {
-    const { identityId, phoneNumber } = options;
+  const entity = await phoneNumberRepository.find({ identityId, phoneNumber });
 
-    const entity = await phoneNumberRepository.find({ identityId, phoneNumber });
-
-    if (entity.primary) {
-      throw new ClientError("Unable to remove primary phoneNumber");
-    }
-
-    await phoneNumberRepository.remove(entity);
-
-    logger.debug("removePhoneNumber successful");
-  } catch (err: any) {
-    logger.error("removePhoneNumber failure", err);
-
-    throw err;
+  if (entity.primary) {
+    throw new ClientError("Unable to remove primary phoneNumber");
   }
+
+  await phoneNumberRepository.remove(entity);
 };

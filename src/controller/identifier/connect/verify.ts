@@ -7,13 +7,13 @@ import { JOI_GUID } from "../../../constant";
 import { connectEmailVerify, connectPhoneNumberVerify } from "../../../handler";
 
 interface RequestData {
+  id: string;
   code: string;
-  session: string;
 }
 
 export const identifierConnectVerifySchema = Joi.object<RequestData>({
+  id: JOI_GUID.required(),
   code: Joi.string().required(),
-  session: JOI_GUID.required(),
 });
 
 export const identifierConnectVerifyController: Controller<Context<RequestData>> = async (
@@ -22,33 +22,22 @@ export const identifierConnectVerifyController: Controller<Context<RequestData>>
   const {
     data: { code },
     entity: { connectSession },
-    logger,
   } = ctx;
 
-  logger.debug("identifierConnectVerifyController");
+  switch (connectSession.type) {
+    case IdentifierType.EMAIL:
+      await connectEmailVerify(ctx, connectSession, code);
+      break;
 
-  try {
-    switch (connectSession.type) {
-      case IdentifierType.EMAIL:
-        await connectEmailVerify(ctx, connectSession, code);
-        break;
+    case IdentifierType.PHONE_NUMBER:
+      await connectPhoneNumberVerify(ctx, connectSession, code);
+      break;
 
-      case IdentifierType.PHONE_NUMBER:
-        await connectPhoneNumberVerify(ctx, connectSession, code);
-        break;
-
-      default:
-        throw new ClientError("Unexpected identifier type");
-    }
-
-    logger.debug("identifierConnectVerifyController successful");
-
-    return {
-      data: {},
-    };
-  } catch (err: any) {
-    logger.error("identifierConnectVerifyController failure", err);
-
-    throw err;
+    default:
+      throw new ClientError("Unexpected identifier type");
   }
+
+  return {
+    data: {},
+  };
 };

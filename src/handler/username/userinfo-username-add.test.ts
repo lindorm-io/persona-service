@@ -1,6 +1,5 @@
 import { userinfoUsernameAdd } from "./userinfo-username-add";
 import { Identity } from "../../entity";
-import { EntityNotUpdatedError } from "@lindorm-io/entity";
 import { logger } from "../../test";
 
 describe("userinfoUsernameAdd", () => {
@@ -52,20 +51,5 @@ describe("userinfoUsernameAdd", () => {
     await expect(userinfoUsernameAdd(ctx, new Identity({}))).resolves.toBeUndefined();
 
     expect(ctx.repository.identityRepository.update).not.toHaveBeenCalled();
-  });
-
-  test("should ignore EntityNotUpdatedError", async () => {
-    ctx.repository.identityRepository.update.mockRejectedValue(
-      new EntityNotUpdatedError("message"),
-    );
-
-    await expect(
-      userinfoUsernameAdd(
-        ctx,
-        new Identity({
-          preferredUsername: "preferredUsername",
-        }),
-      ),
-    ).resolves.toBeUndefined();
   });
 });

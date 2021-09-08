@@ -16,13 +16,8 @@ export const userinfoEmailGet = async (
   identityId: string,
 ): Promise<Result> => {
   const {
-    logger,
     repository: { emailRepository },
   } = ctx;
-
-  logger.debug("userinfoEmailGet", {
-    identityId,
-  });
 
   try {
     const array = await emailRepository.findMany({ identityId });
@@ -36,15 +31,11 @@ export const userinfoEmailGet = async (
 
     const { email, verified } = ordered[0];
 
-    logger.debug("userinfoEmailGet successful");
-
     return {
       email,
       emailVerified: verified,
     };
   } catch (err: any) {
-    logger.error("userinfoEmailGet failure", err);
-
     return EMPTY;
   }
 };

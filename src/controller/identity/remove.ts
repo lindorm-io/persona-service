@@ -17,7 +17,6 @@ export const identityRemoveController: Controller<Context<RequestData>> = async 
 ): ControllerResponse<Record<string, never>> => {
   const {
     entity: { identity },
-    logger,
     repository: {
       emailRepository,
       identityRepository,
@@ -26,26 +25,16 @@ export const identityRemoveController: Controller<Context<RequestData>> = async 
     },
   } = ctx;
 
-  logger.debug("identityRemoveController", ctx.data);
-
-  try {
-    if (identity.displayName.name) {
-      await removeIdentityDisplayName(ctx, identity);
-    }
-
-    await emailRepository.removeMany({ identityId: identity.id });
-    await openIdIdentifierRepository.removeMany({ identityId: identity.id });
-    await phoneNumberRepository.removeMany({ identityId: identity.id });
-    await identityRepository.remove(identity);
-
-    logger.debug("identityRemoveController successful");
-
-    return {
-      data: {},
-    };
-  } catch (err: any) {
-    logger.error("identityRemoveController failure", err);
-
-    throw err;
+  if (identity.displayName.name) {
+    await removeIdentityDisplayName(ctx, identity);
   }
+
+  await emailRepository.removeMany({ identityId: identity.id });
+  await openIdIdentifierRepository.removeMany({ identityId: identity.id });
+  await phoneNumberRepository.removeMany({ identityId: identity.id });
+  await identityRepository.remove(identity);
+
+  return {
+    data: {},
+  };
 };

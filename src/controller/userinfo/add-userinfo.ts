@@ -74,149 +74,139 @@ export const userinfoAddController: Controller<Context<RequestData>> = async (
       website,
       zoneInfo,
     },
-    logger,
+
     entity: { identity },
     repository: { identityRepository },
   } = ctx;
 
-  logger.debug("userinfoAddController", ctx.data);
+  const { id: identityId } = identity;
 
-  try {
-    const { id: identityId } = identity;
-
-    if (
-      (address?.country ||
-        address?.locality ||
-        address?.postalCode ||
-        address?.region ||
-        address?.streetAddress) &&
-      shouldUserinfoReplace(identity, IdentityEvent.ADDRESS_CHANGED, updatedAt)
-    ) {
-      identity.address = {
-        country: address?.country,
-        locality: address?.locality,
-        postalCode: address?.postalCode,
-        region: address?.region,
-        streetAddress: address?.streetAddress.split("\n"),
-      };
-    }
-
-    if (
-      birthDate &&
-      shouldUserinfoReplace(identity, IdentityEvent.BIRTH_DATE_CHANGED, updatedAt)
-    ) {
-      identity.birthDate = birthDate;
-    }
-
-    if (
-      familyName &&
-      shouldUserinfoReplace(identity, IdentityEvent.FAMILY_NAME_CHANGED, updatedAt)
-    ) {
-      identity.familyName = familyName;
-    }
-
-    if (
-      gender &&
-      shouldUserinfoReplace(identity, IdentityEvent.GENDER_CHANGED, updatedAt)
-    ) {
-      identity.gender = gender;
-    }
-
-    if (
-      givenName &&
-      shouldUserinfoReplace(identity, IdentityEvent.GIVEN_NAME_CHANGED, updatedAt)
-    ) {
-      identity.givenName = givenName;
-    }
-
-    if (
-      locale &&
-      shouldUserinfoReplace(identity, IdentityEvent.LOCALE_CHANGED, updatedAt)
-    ) {
-      identity.locale = locale;
-    }
-
-    if (
-      middleName &&
-      shouldUserinfoReplace(identity, IdentityEvent.MIDDLE_NAME_CHANGED, updatedAt)
-    ) {
-      identity.middleName = middleName;
-    }
-
-    if (
-      nickname &&
-      shouldUserinfoReplace(identity, IdentityEvent.NICKNAME_CHANGED, updatedAt)
-    ) {
-      identity.nickname = nickname;
-    }
-
-    if (
-      picture &&
-      shouldUserinfoReplace(identity, IdentityEvent.PICTURE_CHANGED, updatedAt)
-    ) {
-      identity.picture = picture;
-    }
-
-    if (
-      profile &&
-      shouldUserinfoReplace(identity, IdentityEvent.PROFILE_CHANGED, updatedAt)
-    ) {
-      identity.profile = profile;
-    }
-
-    if (
-      preferredUsername &&
-      shouldUserinfoReplace(identity, IdentityEvent.USERNAME_CHANGED, updatedAt)
-    ) {
-      identity.preferredUsername = preferredUsername;
-    }
-
-    if (
-      website &&
-      shouldUserinfoReplace(identity, IdentityEvent.WEBSITE_CHANGED, updatedAt)
-    ) {
-      identity.website = website;
-    }
-
-    if (
-      zoneInfo &&
-      shouldUserinfoReplace(identity, IdentityEvent.ZONE_INFO_CHANGED, updatedAt)
-    ) {
-      identity.zoneInfo = zoneInfo;
-    }
-
-    await identityRepository.update(identity);
-
-    if (email) {
-      await userinfoEmailAdd(ctx, {
-        identityId,
-        email,
-      });
-    }
-
-    if (phoneNumber) {
-      await userinfoPhoneNumberAdd(ctx, {
-        identityId,
-        phoneNumber,
-      });
-    }
-
-    await userinfoOpenIdIdentifierAdd(ctx, {
-      identityId,
-      identifier: sub,
-      provider,
-    });
-
-    await userinfoUsernameAdd(ctx, identity);
-
-    logger.debug("userinfoAddController successful");
-
-    return {
-      data: {},
+  if (
+    (address?.country ||
+      address?.locality ||
+      address?.postalCode ||
+      address?.region ||
+      address?.streetAddress) &&
+    shouldUserinfoReplace(identity, IdentityEvent.ADDRESS_CHANGED, updatedAt)
+  ) {
+    identity.address = {
+      country: address?.country,
+      locality: address?.locality,
+      postalCode: address?.postalCode,
+      region: address?.region,
+      streetAddress: address?.streetAddress.split("\n"),
     };
-  } catch (err: any) {
-    logger.error("userinfoAddController failure", err);
-
-    throw err;
   }
+
+  if (
+    birthDate &&
+    shouldUserinfoReplace(identity, IdentityEvent.BIRTH_DATE_CHANGED, updatedAt)
+  ) {
+    identity.birthDate = birthDate;
+  }
+
+  if (
+    familyName &&
+    shouldUserinfoReplace(identity, IdentityEvent.FAMILY_NAME_CHANGED, updatedAt)
+  ) {
+    identity.familyName = familyName;
+  }
+
+  if (
+    gender &&
+    shouldUserinfoReplace(identity, IdentityEvent.GENDER_CHANGED, updatedAt)
+  ) {
+    identity.gender = gender;
+  }
+
+  if (
+    givenName &&
+    shouldUserinfoReplace(identity, IdentityEvent.GIVEN_NAME_CHANGED, updatedAt)
+  ) {
+    identity.givenName = givenName;
+  }
+
+  if (
+    locale &&
+    shouldUserinfoReplace(identity, IdentityEvent.LOCALE_CHANGED, updatedAt)
+  ) {
+    identity.locale = locale;
+  }
+
+  if (
+    middleName &&
+    shouldUserinfoReplace(identity, IdentityEvent.MIDDLE_NAME_CHANGED, updatedAt)
+  ) {
+    identity.middleName = middleName;
+  }
+
+  if (
+    nickname &&
+    shouldUserinfoReplace(identity, IdentityEvent.NICKNAME_CHANGED, updatedAt)
+  ) {
+    identity.nickname = nickname;
+  }
+
+  if (
+    picture &&
+    shouldUserinfoReplace(identity, IdentityEvent.PICTURE_CHANGED, updatedAt)
+  ) {
+    identity.picture = picture;
+  }
+
+  if (
+    profile &&
+    shouldUserinfoReplace(identity, IdentityEvent.PROFILE_CHANGED, updatedAt)
+  ) {
+    identity.profile = profile;
+  }
+
+  if (
+    preferredUsername &&
+    shouldUserinfoReplace(identity, IdentityEvent.USERNAME_CHANGED, updatedAt)
+  ) {
+    identity.preferredUsername = preferredUsername;
+  }
+
+  if (
+    website &&
+    shouldUserinfoReplace(identity, IdentityEvent.WEBSITE_CHANGED, updatedAt)
+  ) {
+    identity.website = website;
+  }
+
+  if (
+    zoneInfo &&
+    shouldUserinfoReplace(identity, IdentityEvent.ZONE_INFO_CHANGED, updatedAt)
+  ) {
+    identity.zoneInfo = zoneInfo;
+  }
+
+  await identityRepository.update(identity);
+
+  if (email) {
+    await userinfoEmailAdd(ctx, {
+      identityId,
+      email,
+    });
+  }
+
+  if (phoneNumber) {
+    await userinfoPhoneNumberAdd(ctx, {
+      identityId,
+      phoneNumber,
+    });
+  }
+
+  await userinfoOpenIdIdentifierAdd(ctx, {
+    identityId,
+    identifier: sub,
+    provider,
+  });
+
+  await userinfoUsernameAdd(ctx, identity);
+
+  return {
+    data: {},
+  };
 };

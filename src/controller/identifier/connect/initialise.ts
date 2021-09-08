@@ -10,6 +10,7 @@ import {
 } from "../../../constant";
 import { ClientError } from "@lindorm-io/errors";
 import { connectEmailInitialise, connectPhoneNumberInitialise } from "../../../handler";
+import { ConnectSession } from "../../../entity";
 
 interface RequestData {
   id: string;
@@ -17,6 +18,10 @@ interface RequestData {
 
   email: string;
   phoneNumber: string;
+}
+
+interface ResponseData {
+  sessionId: string;
 }
 
 export const identifierConnectInitialiseSchema = Joi.object<RequestData>({
@@ -36,43 +41,30 @@ export const identifierConnectInitialiseSchema = Joi.object<RequestData>({
 });
 
 export const identifierConnectInitialiseController: Controller<Context<RequestData>> =
-  async (ctx): ControllerResponse<Record<string, never>> => {
+  async (ctx): ControllerResponse<ResponseData> => {
     const {
       data: { email, phoneNumber, type },
       entity: { identity },
-      logger,
     } = ctx;
 
-    logger.debug("identifierConnectInitialiseController", ctx.data);
+    let session: ConnectSession;
 
-    try {
-      switch (type) {
-        case IdentifierType.EMAIL:
-          await connectEmailInitialise(ctx, {
-            identityId: identity.id,
-            email,
-          });
-          break;
+    switch (type) {
+      case IdentifierType.EMAIL:
+        session = await connectEmailInitialise(ctx, identity, email);
+        break;
 
-        case IdentifierType.PHONE_NUMBER:
-          await connectPhoneNumberInitialise(ctx, {
-            identityId: identity.id,
-            phoneNumber,
-          });
-          break;
+      case IdentifierType.PHONE_NUMBER:
+        session = await connectPhoneNumberInitialise(ctx, identity, phoneNumber);
+        break;
 
-        default:
-          throw new ClientError("Unexpected identifier type");
-      }
-
-      logger.debug("identifierConnectInitialiseController successful");
-
-      return {
-        data: {},
-      };
-    } catch (err: any) {
-      logger.error("identifierConnectInitialiseController failure", err);
-
-      throw err;
+      default:
+        throw new ClientError("Unexpected identifier type");
     }
+
+    return {
+      data: {
+        sessionId: session.id,
+      },
+    };
   };

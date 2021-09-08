@@ -91,118 +91,104 @@ export const identityUpdateController: Controller<Context<RequestData>> = async 
       zoneInfo,
     },
     entity: { identity },
-    logger,
     repository: { identityRepository },
     token: {
       bearerToken: { scopes },
     },
   } = ctx;
 
-  logger.debug("identityUpdateController", ctx.data);
-
-  try {
-    if (includes(scopes, Scope.ADDRESS)) {
-      if (address && !isEqual(identity.address, address)) {
-        identity.address = address;
-      }
+  if (includes(scopes, Scope.ADDRESS)) {
+    if (address && !isEqual(identity.address, address)) {
+      identity.address = address;
     }
-
-    if (includes(scopes, Scope.PROFILE)) {
-      if (birthDate && birthDate !== identity.birthDate) {
-        identity.birthDate = birthDate;
-      }
-
-      if (displayName && displayName !== identity.displayName.name) {
-        await updateIdentityDisplayName(ctx, identity, displayName);
-      }
-
-      if (familyName && familyName !== identity.familyName) {
-        identity.familyName = familyName;
-      }
-
-      if (gender && gender !== identity.gender) {
-        identity.gender = gender;
-      }
-
-      if (givenName && givenName !== identity.givenName) {
-        identity.givenName = givenName;
-      }
-
-      if (gravatar && gravatar !== identity.gravatar) {
-        identity.gravatar = gravatar;
-      }
-
-      if (locale && locale !== identity.locale) {
-        identity.locale = locale;
-      }
-
-      if (middleName && middleName !== identity.middleName) {
-        identity.middleName = middleName;
-      }
-
-      if (namingSystem && namingSystem !== identity.namingSystem) {
-        identity.namingSystem = namingSystem;
-      }
-
-      if (nickname && nickname !== identity.nickname) {
-        identity.nickname = nickname;
-      }
-
-      if (picture && picture !== identity.picture) {
-        identity.picture = picture;
-      }
-
-      if (
-        preferredAccessibility &&
-        !isEqual(preferredAccessibility, identity.preferredAccessibility)
-      ) {
-        identity.preferredAccessibility = preferredAccessibility;
-      }
-
-      if (preferredUsername && preferredUsername !== identity.preferredUsername) {
-        identity.preferredUsername = preferredUsername;
-      }
-
-      if (profile && profile !== identity.profile) {
-        identity.profile = profile;
-      }
-
-      if (pronouns && pronouns !== identity.pronouns) {
-        identity.pronouns = pronouns;
-      }
-
-      if (website && website !== identity.website) {
-        identity.website = website;
-      }
-
-      if (zoneInfo && zoneInfo !== identity.zoneInfo) {
-        identity.zoneInfo = zoneInfo;
-      }
-    }
-
-    if (includes(scopes, Scope.PRIVATE)) {
-      if (
-        socialSecurityNumber &&
-        socialSecurityNumber !== identity.socialSecurityNumber
-      ) {
-        identity.socialSecurityNumber = socialSecurityNumber;
-      }
-
-      if (username && username !== identity.username) {
-        identity.username = username;
-      }
-    }
-
-    await identityRepository.update(identity);
-
-    logger.debug("identityUpdateController successful");
-
-    return {
-      data: {},
-    };
-  } catch (err: any) {
-    logger.error("identityUpdateController failure", err);
-
-    throw err;
   }
+
+  if (includes(scopes, Scope.PROFILE)) {
+    if (birthDate && birthDate !== identity.birthDate) {
+      identity.birthDate = birthDate;
+    }
+
+    if (displayName && displayName !== identity.displayName.name) {
+      await updateIdentityDisplayName(ctx, identity, displayName);
+    }
+
+    if (familyName && familyName !== identity.familyName) {
+      identity.familyName = familyName;
+    }
+
+    if (gender && gender !== identity.gender) {
+      identity.gender = gender;
+    }
+
+    if (givenName && givenName !== identity.givenName) {
+      identity.givenName = givenName;
+    }
+
+    if (gravatar && gravatar !== identity.gravatar) {
+      identity.gravatar = gravatar;
+    }
+
+    if (locale && locale !== identity.locale) {
+      identity.locale = locale;
+    }
+
+    if (middleName && middleName !== identity.middleName) {
+      identity.middleName = middleName;
+    }
+
+    if (namingSystem && namingSystem !== identity.namingSystem) {
+      identity.namingSystem = namingSystem;
+    }
+
+    if (nickname && nickname !== identity.nickname) {
+      identity.nickname = nickname;
+    }
+
+    if (picture && picture !== identity.picture) {
+      identity.picture = picture;
+    }
+
+    if (
+      preferredAccessibility &&
+      !isEqual(preferredAccessibility, identity.preferredAccessibility)
+    ) {
+      identity.preferredAccessibility = preferredAccessibility;
+    }
+
+    if (preferredUsername && preferredUsername !== identity.preferredUsername) {
+      identity.preferredUsername = preferredUsername;
+    }
+
+    if (profile && profile !== identity.profile) {
+      identity.profile = profile;
+    }
+
+    if (pronouns && pronouns !== identity.pronouns) {
+      identity.pronouns = pronouns;
+    }
+
+    if (website && website !== identity.website) {
+      identity.website = website;
+    }
+
+    if (zoneInfo && zoneInfo !== identity.zoneInfo) {
+      identity.zoneInfo = zoneInfo;
+    }
+  }
+
+  if (includes(scopes, Scope.PRIVATE)) {
+    if (socialSecurityNumber && socialSecurityNumber !== identity.socialSecurityNumber) {
+      identity.socialSecurityNumber = socialSecurityNumber;
+    }
+
+    if (username && username !== identity.username) {
+      identity.username = username;
+    }
+  }
+
+  await identityRepository.update(identity);
+
+  return {
+    data: {},
+  };
 };
