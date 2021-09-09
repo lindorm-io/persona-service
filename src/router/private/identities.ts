@@ -5,7 +5,7 @@ import {
   Router,
   schemaMiddleware,
 } from "@lindorm-io/koa";
-import { identityEntityMiddleware } from "../../middleware";
+import { basicAuthMiddleware, identityEntityMiddleware } from "../../middleware";
 import {
   userinfoAddController,
   userinfoAddSchema,
@@ -15,6 +15,8 @@ import {
 
 const router = new Router<unknown, Context>();
 export default router;
+
+router.use(basicAuthMiddleware);
 
 router.get(
   "/:id/userinfo",

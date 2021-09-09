@@ -1,6 +1,7 @@
 import MockDate from "mockdate";
 import request from "supertest";
 import { SCOPE_HINT } from "../../constant";
+import { baseHash } from "@lindorm-io/core";
 import { koa } from "../../server/koa";
 import { v4 as uuid } from "uuid";
 import {
@@ -18,6 +19,8 @@ import {
 
 MockDate.set("2021-01-01T08:00:00.000Z");
 
+const basicAuth = baseHash("secret:secret");
+
 describe("/private/identities", () => {
   beforeAll(setupIntegration);
 
@@ -34,6 +37,7 @@ describe("/private/identities", () => {
 
     const response = await request(koa.callback())
       .get(`/private/identities/${identity.id}/userinfo`)
+      .set("Authorization", `Basic ${basicAuth}`)
       .expect(200);
 
     expect(response.body).toStrictEqual({
@@ -82,6 +86,7 @@ describe("/private/identities", () => {
 
     await request(koa.callback())
       .put(`/private/identities/${identity.id}/userinfo`)
+      .set("Authorization", `Basic ${basicAuth}`)
       .send({
         provider: "https://google.com/",
         sub: "b2f8c2e66cbc4875a39043ebb9dce576",

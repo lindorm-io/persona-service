@@ -1,5 +1,6 @@
 import MockDate from "mockdate";
 import request from "supertest";
+import { baseHash } from "@lindorm-io/core";
 import { koa } from "../../server/koa";
 import {
   TEST_EMAIL_REPOSITORY,
@@ -15,6 +16,8 @@ import {
 
 MockDate.set("2021-01-01T08:00:00.000Z");
 
+const basicAuth = baseHash("secret:secret");
+
 describe("/private/identifiers", () => {
   beforeAll(async () => {
     await setupIntegration();
@@ -28,6 +31,7 @@ describe("/private/identifiers", () => {
   test("POST /email/auth/verify", async () => {
     const response = await request(koa.callback())
       .post("/private/identifiers/email/auth/verify")
+      .set("Authorization", `Basic ${basicAuth}`)
       .send({
         email: "test@lindorm.io",
       })
@@ -41,6 +45,7 @@ describe("/private/identifiers", () => {
   test("POST /phone_number/auth/verify", async () => {
     const response = await request(koa.callback())
       .post("/private/identifiers/phone_number/auth/verify")
+      .set("Authorization", `Basic ${basicAuth}`)
       .send({
         phone_number: "+46701234567",
       })
@@ -54,6 +59,7 @@ describe("/private/identifiers", () => {
   test("POST /oidc/auth/verify", async () => {
     const response = await request(koa.callback())
       .post("/private/identifiers/oidc/auth/verify")
+      .set("Authorization", `Basic ${basicAuth}`)
       .send({
         identifier: "6f705339272d4ba3b4392ab628b000f3",
         provider: "https://apple.com/",
@@ -68,6 +74,7 @@ describe("/private/identifiers", () => {
   test("POST /username/auth/verify", async () => {
     const response = await request(koa.callback())
       .post("/private/identifiers/username/auth/verify")
+      .set("Authorization", `Basic ${basicAuth}`)
       .send({
         username: "username",
       })

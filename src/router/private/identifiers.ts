@@ -9,9 +9,12 @@ import {
   identifierAuthVerifyController,
   identifierAuthVerifySchema,
 } from "../../controller";
+import { basicAuthMiddleware } from "../../middleware";
 
 const router = new Router<unknown, Context>();
 export default router;
+
+router.use(basicAuthMiddleware);
 
 router.post(
   "/:type/auth/verify",
