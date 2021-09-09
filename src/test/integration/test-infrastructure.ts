@@ -1,4 +1,4 @@
-import { MONGO_CONNECTION_OPTIONS, REDIS_CONNECTION_OPTIONS } from "../config";
+import { MONGO_CONNECTION_OPTIONS, REDIS_CONNECTION_OPTIONS } from "../../config";
 import { MongoConnection, MongoConnectionType } from "@lindorm-io/mongo";
 import { RedisConnection, RedisConnectionType } from "@lindorm-io/redis";
 import { inMemoryCache, inMemoryStore } from "./in-memory";

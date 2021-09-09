@@ -1,6 +1,6 @@
 import { getTestJwt } from "./test-jwt";
 import { IssuerSignOptions } from "@lindorm-io/jwt";
-import { Scope } from "../enum";
+import { Scope } from "../../enum";
 
 export const getTestAccessToken = (
   options: Partial<IssuerSignOptions<any, any>> = {},

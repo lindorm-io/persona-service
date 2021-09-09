@@ -1,6 +1,6 @@
-import { ConnectSession, ConnectSessionOptions } from "../entity";
-import { cryptoLayered } from "../instance";
-import { IdentifierType } from "../enum";
+import { ConnectSession, ConnectSessionOptions } from "../../entity";
+import { cryptoLayered } from "../../instance";
+import { IdentifierType } from "../../enum";
 
 export const getTestConnectSession = async (
   options: Partial<ConnectSessionOptions> = {},

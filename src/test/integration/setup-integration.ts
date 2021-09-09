@@ -8,7 +8,7 @@ import {
   IdentityRepository,
   OpenIdIdentifierRepository,
   PhoneNumberRepository,
-} from "../infrastructure";
+} from "../../infrastructure";
 
 export let TEST_CONNECT_SESSION_CACHE: ConnectSessionCache;
 

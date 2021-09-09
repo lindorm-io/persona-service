@@ -1,5 +1,5 @@
-import { Identity, IdentityOptions } from "../entity";
-import { NamingSystem } from "../enum";
+import { Identity, IdentityOptions } from "../../entity";
+import { NamingSystem } from "../../enum";
 
 export const getTestIdentity = (options: Partial<IdentityOptions> = {}): Identity =>
   new Identity({

@@ -1,7 +1,7 @@
-import { ConnectSessionCache } from "../infrastructure";
+import { ConnectSessionCache } from "../../infrastructure";
 import { KeyPairCache } from "@lindorm-io/koa-keystore";
 import { getTestRedis } from "./test-infrastructure";
-import { winston } from "../logger";
+import { winston } from "../../logger";
 
 interface TestCache {
   connectSessionCache: ConnectSessionCache;

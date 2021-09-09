@@ -1,4 +1,4 @@
-import { Email, EmailOptions } from "../entity";
+import { Email, EmailOptions } from "../../entity";
 
 export const getTestEmail = (options: Partial<EmailOptions> = {}): Email =>
   new Email({

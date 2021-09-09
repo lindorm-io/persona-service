@@ -1,4 +1,4 @@
-import { OpenIdIdentifier, OpenIdIdentifierOptions } from "../entity";
+import { OpenIdIdentifier, OpenIdIdentifierOptions } from "../../entity";
 
 export const getTestOpenIdIdentifier = (
   options: Partial<OpenIdIdentifierOptions> = {},

@@ -1,12 +1,12 @@
 import { getTestMongo } from "./test-infrastructure";
-import { winston } from "../logger";
+import { winston } from "../../logger";
 import {
   DisplayNameRepository,
   EmailRepository,
   IdentityRepository,
   OpenIdIdentifierRepository,
   PhoneNumberRepository,
-} from "../infrastructure";
+} from "../../infrastructure";
 
 interface TestRepository {
   displayNameRepository: DisplayNameRepository;

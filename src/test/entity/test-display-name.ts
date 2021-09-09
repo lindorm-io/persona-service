@@ -1,4 +1,4 @@
-import { DisplayName, DisplayNameOptions } from "../entity";
+import { DisplayName, DisplayNameOptions } from "../../entity";
 
 export const getTestDisplayName = (
   options: Partial<DisplayNameOptions> = {},

@@ -1,4 +1,4 @@
-import { PhoneNumber, PhoneNumberOptions } from "../entity";
+import { PhoneNumber, PhoneNumberOptions } from "../../entity";
 
 export const getTestPhoneNumber = (
   options: Partial<PhoneNumberOptions> = {},
