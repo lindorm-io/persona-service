@@ -8,6 +8,4 @@ export enum Scope {
 
   // identity service scopes
   PRIVATE = "private",
-  REMOVE_IDENTITY = "remove_identity",
-  UPDATE_IDENTITY = "update_identity",
 }
