@@ -21,8 +21,6 @@ export const getTestAccessToken = (
       Scope.PROFILE,
 
       Scope.PRIVATE,
-      Scope.REMOVE_IDENTITY,
-      Scope.UPDATE_IDENTITY,
     ],
     subject: "dcb17352-223e-4f4b-892c-b17a2ec09de2",
     subjectHint: "identity",

@@ -42,7 +42,7 @@ router.put(
   paramsMiddleware,
   schemaMiddleware("data", identityUpdateSchema),
   bearerAuthMiddleware({
-    scopes: [Scope.OPENID, Scope.UPDATE_IDENTITY],
+    scopes: [Scope.OPENID],
     fromPath: { subject: "data.id" },
   }),
   identityEntityMiddleware("data.id"),
@@ -54,7 +54,7 @@ router.delete(
   paramsMiddleware,
   schemaMiddleware("data", identityRemoveSchema),
   bearerAuthMiddleware({
-    scopes: [Scope.OPENID, Scope.REMOVE_IDENTITY],
+    scopes: [Scope.OPENID],
     fromPath: { subject: "data.id" },
   }),
   identityEntityMiddleware("data.id"),
@@ -66,7 +66,7 @@ router.post(
   paramsMiddleware,
   schemaMiddleware("data", identifierConnectInitialiseSchema),
   bearerAuthMiddleware({
-    scopes: [Scope.OPENID, Scope.UPDATE_IDENTITY],
+    scopes: [Scope.OPENID],
     fromPath: { subject: "data.id" },
   }),
   identityEntityMiddleware("data.id"),
@@ -78,7 +78,7 @@ router.delete(
   paramsMiddleware,
   schemaMiddleware("data", identifierRemoveSchema),
   bearerAuthMiddleware({
-    scopes: [Scope.OPENID, Scope.UPDATE_IDENTITY],
+    scopes: [Scope.OPENID],
     fromPath: { subject: "data.id" },
   }),
   identityEntityMiddleware("data.id"),
@@ -90,7 +90,7 @@ router.put(
   paramsMiddleware,
   schemaMiddleware("data", identifierSetPrimarySchema),
   bearerAuthMiddleware({
-    scopes: [Scope.OPENID, Scope.UPDATE_IDENTITY],
+    scopes: [Scope.OPENID],
     fromPath: { subject: "data.id" },
   }),
   identityEntityMiddleware("data.id"),

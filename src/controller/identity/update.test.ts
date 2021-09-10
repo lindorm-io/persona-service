@@ -62,7 +62,6 @@ describe("identityUpdateController", () => {
             Scope.PHONE,
             Scope.PROFILE,
             Scope.PRIVATE,
-            Scope.UPDATE_IDENTITY,
           ],
           subject: "identityId",
         },

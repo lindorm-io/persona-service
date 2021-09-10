@@ -1,4 +1,3 @@
-import { Scope } from "../../enum";
 import { getTestIdentity, logger } from "../../test";
 import { identityRemoveController } from "./remove";
 import { removeIdentityDisplayName as _removeIdentityDisplayName } from "../../handler";
@@ -36,7 +35,6 @@ describe("identityRemoveController", () => {
       },
       token: {
         bearerToken: {
-          scopes: [Scope.REMOVE_IDENTITY],
           subject: "identityId",
         },
       },
