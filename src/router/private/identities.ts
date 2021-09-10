@@ -7,6 +7,8 @@ import {
 } from "@lindorm-io/koa";
 import { basicAuthMiddleware, identityEntityMiddleware } from "../../middleware";
 import {
+  identityGetAuthMethodsController,
+  identityGetAuthMethodsSchema,
   userinfoAddController,
   userinfoAddSchema,
   userinfoGetController,
@@ -17,6 +19,13 @@ const router = new Router<unknown, Context>();
 export default router;
 
 router.use(basicAuthMiddleware);
+
+router.get(
+  "/:id/auth-methods",
+  paramsMiddleware,
+  schemaMiddleware("data", identityGetAuthMethodsSchema),
+  createController(identityGetAuthMethodsController),
+);
 
 router.get(
   "/:id/userinfo",

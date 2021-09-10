@@ -15,6 +15,7 @@ import {
   getTestIdentity,
   getTestPhoneNumber,
   setupIntegration,
+  getTestOpenIdIdentifier,
 } from "../../test";
 
 MockDate.set("2021-01-01T08:00:00.000Z");
@@ -23,6 +24,37 @@ const basicAuth = baseHash("secret:secret");
 
 describe("/private/identities", () => {
   beforeAll(setupIntegration);
+
+  test("GET /:id/auth-methods", async () => {
+    const identity = await TEST_IDENTITY_REPOSITORY.create(
+      getTestIdentity({ id: uuid() }),
+    );
+
+    await TEST_EMAIL_REPOSITORY.create(getTestEmail({ identityId: identity.id }));
+    await TEST_PHONE_NUMBER_REPOSITORY.create(
+      getTestPhoneNumber({ identityId: identity.id }),
+    );
+    await TEST_OPEN_ID_IDENTIFIER_REPOSITORY.create(
+      getTestOpenIdIdentifier({ identityId: identity.id }),
+    );
+    await TEST_OPEN_ID_IDENTIFIER_REPOSITORY.create(
+      getTestOpenIdIdentifier({
+        identityId: identity.id,
+        provider: "https://google.com/",
+      }),
+    );
+
+    const response = await request(koa.callback())
+      .get(`/private/identities/${identity.id}/auth-methods`)
+      .set("Authorization", `Basic ${basicAuth}`)
+      .expect(200);
+
+    expect(response.body).toStrictEqual({
+      connected_open_id_providers: ["https://apple.com/", "https://google.com/"],
+      email: "test@lindorm.io",
+      phone_number: "+46701234567",
+    });
+  });
 
   test("GET /:id/userinfo", async () => {
     const identity = await TEST_IDENTITY_REPOSITORY.create(
