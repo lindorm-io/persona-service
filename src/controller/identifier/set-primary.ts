@@ -37,7 +37,7 @@ export const identifierSetPrimarySchema = Joi.object<RequestData>({
 
 export const identifierSetPrimaryController: Controller<Context<RequestData>> = async (
   ctx,
-): ControllerResponse<Record<string, never>> => {
+): ControllerResponse => {
   const {
     data: { email, phoneNumber, type },
     entity: { identity },

@@ -66,7 +66,7 @@ export const identityUpdateSchema = Joi.object<RequestData>({
 
 export const identityUpdateController: Controller<Context<RequestData>> = async (
   ctx,
-): ControllerResponse<Record<string, never>> => {
+): ControllerResponse => {
   const {
     data: {
       address,

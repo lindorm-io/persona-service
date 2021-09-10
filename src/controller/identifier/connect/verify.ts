@@ -18,7 +18,7 @@ export const identifierConnectVerifySchema = Joi.object<RequestData>({
 
 export const identifierConnectVerifyController: Controller<Context<RequestData>> = async (
   ctx,
-): ControllerResponse<Record<string, never>> => {
+): ControllerResponse => {
   const {
     data: { code },
     entity: { connectSession },

@@ -40,31 +40,32 @@ export const identifierConnectInitialiseSchema = Joi.object<RequestData>({
   }),
 });
 
-export const identifierConnectInitialiseController: Controller<Context<RequestData>> =
-  async (ctx): ControllerResponse<ResponseData> => {
-    const {
-      data: { email, phoneNumber, type },
-      entity: { identity },
-    } = ctx;
+export const identifierConnectInitialiseController: Controller<
+  Context<RequestData, ResponseData>
+> = async (ctx): ControllerResponse<ResponseData> => {
+  const {
+    data: { email, phoneNumber, type },
+    entity: { identity },
+  } = ctx;
 
-    let session: ConnectSession;
+  let session: ConnectSession;
 
-    switch (type) {
-      case IdentifierType.EMAIL:
-        session = await connectEmailInitialise(ctx, identity, email);
-        break;
+  switch (type) {
+    case IdentifierType.EMAIL:
+      session = await connectEmailInitialise(ctx, identity, email);
+      break;
 
-      case IdentifierType.PHONE_NUMBER:
-        session = await connectPhoneNumberInitialise(ctx, identity, phoneNumber);
-        break;
+    case IdentifierType.PHONE_NUMBER:
+      session = await connectPhoneNumberInitialise(ctx, identity, phoneNumber);
+      break;
 
-      default:
-        throw new ClientError("Unexpected identifier type");
-    }
+    default:
+      throw new ClientError("Unexpected identifier type");
+  }
 
-    return {
-      data: {
-        sessionId: session.id,
-      },
-    };
+  return {
+    data: {
+      sessionId: session.id,
+    },
   };
+};

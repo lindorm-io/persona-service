@@ -14,7 +14,7 @@ export const identityRemoveSchema = Joi.object<RequestData>({
 
 export const identityRemoveController: Controller<Context<RequestData>> = async (
   ctx,
-): ControllerResponse<Record<string, never>> => {
+): ControllerResponse => {
   const {
     entity: { identity },
     repository: {

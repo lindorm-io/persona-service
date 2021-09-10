@@ -49,9 +49,9 @@ export const identifierAuthVerifySchema = Joi.object<RequestData>({
   type: JOI_IDENTIFIER_TYPE.required(),
 });
 
-export const identifierAuthVerifyController: Controller<Context<RequestData>> = async (
-  ctx,
-): ControllerResponse<ResponseData> => {
+export const identifierAuthVerifyController: Controller<
+  Context<RequestData, ResponseData>
+> = async (ctx): ControllerResponse<ResponseData> => {
   const {
     data: { email, identifier, phoneNumber, provider, type, username },
     repository: { identityRepository },

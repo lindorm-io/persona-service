@@ -47,76 +47,75 @@ export const identityGetSchema = Joi.object<RequestData>({
   id: JOI_GUID.required(),
 });
 
-export const identityGetController: Controller<Context<RequestData>> = async (
-  ctx,
-): ControllerResponse<Partial<ResponseData>> => {
-  const {
-    entity: { identity },
-    repository: { emailRepository, phoneNumberRepository },
-    token: {
-      bearerToken: { scopes },
-    },
-  } = ctx;
+export const identityGetController: Controller<Context<RequestData, ResponseData>> =
+  async (ctx): ControllerResponse<Partial<ResponseData>> => {
+    const {
+      entity: { identity },
+      repository: { emailRepository, phoneNumberRepository },
+      token: {
+        bearerToken: { scopes },
+      },
+    } = ctx;
 
-  const data: Partial<ResponseData> = {};
+    const data: Partial<ResponseData> = {};
 
-  if (includes(scopes, Scope.ADDRESS)) {
-    data.address = identity.address;
-  }
-
-  if (includes(scopes, Scope.EMAIL)) {
-    data.emails = [];
-
-    const list = await emailRepository.findMany({ identityId: identity.id });
-
-    for (const item of list) {
-      data.emails.push({
-        email: item.email,
-        primary: item.primary,
-        verified: item.verified,
-      });
+    if (includes(scopes, Scope.ADDRESS)) {
+      data.address = identity.address;
     }
-  }
 
-  if (includes(scopes, Scope.PHONE)) {
-    data.phoneNumbers = [];
+    if (includes(scopes, Scope.EMAIL)) {
+      data.emails = [];
 
-    const list = await phoneNumberRepository.findMany({ identityId: identity.id });
+      const list = await emailRepository.findMany({ identityId: identity.id });
 
-    for (const item of list) {
-      data.phoneNumbers.push({
-        phoneNumber: item.phoneNumber,
-        primary: item.primary,
-        verified: item.verified,
-      });
+      for (const item of list) {
+        data.emails.push({
+          email: item.email,
+          primary: item.primary,
+          verified: item.verified,
+        });
+      }
     }
-  }
 
-  if (includes(scopes, Scope.PROFILE)) {
-    data.birthDate = identity.birthDate;
-    data.displayName = getDisplayName(identity);
-    data.familyName = identity.familyName;
-    data.gender = identity.gender;
-    data.givenName = identity.givenName;
-    data.gravatar = identity.gravatar;
-    data.locale = identity.locale;
-    data.middleName = identity.middleName;
-    data.nickname = identity.nickname;
-    data.picture = identity.picture;
-    data.preferredUsername = identity.preferredUsername;
-    data.profile = identity.profile;
-    data.pronouns = identity.pronouns;
-    data.website = identity.website;
-    data.zoneInfo = identity.zoneInfo;
-  }
+    if (includes(scopes, Scope.PHONE)) {
+      data.phoneNumbers = [];
 
-  if (includes(scopes, Scope.PRIVATE)) {
-    data.connectedProviders = await getConnectedProviders(ctx, identity.id);
-    data.socialSecurityNumber = identity.socialSecurityNumber;
-    data.username = identity.username;
-  }
+      const list = await phoneNumberRepository.findMany({ identityId: identity.id });
 
-  return {
-    data,
+      for (const item of list) {
+        data.phoneNumbers.push({
+          phoneNumber: item.phoneNumber,
+          primary: item.primary,
+          verified: item.verified,
+        });
+      }
+    }
+
+    if (includes(scopes, Scope.PROFILE)) {
+      data.birthDate = identity.birthDate;
+      data.displayName = getDisplayName(identity);
+      data.familyName = identity.familyName;
+      data.gender = identity.gender;
+      data.givenName = identity.givenName;
+      data.gravatar = identity.gravatar;
+      data.locale = identity.locale;
+      data.middleName = identity.middleName;
+      data.nickname = identity.nickname;
+      data.picture = identity.picture;
+      data.preferredUsername = identity.preferredUsername;
+      data.profile = identity.profile;
+      data.pronouns = identity.pronouns;
+      data.website = identity.website;
+      data.zoneInfo = identity.zoneInfo;
+    }
+
+    if (includes(scopes, Scope.PRIVATE)) {
+      data.connectedProviders = await getConnectedProviders(ctx, identity.id);
+      data.socialSecurityNumber = identity.socialSecurityNumber;
+      data.username = identity.username;
+    }
+
+    return {
+      data,
+    };
   };
-};

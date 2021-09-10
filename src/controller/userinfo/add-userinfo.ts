@@ -52,7 +52,7 @@ export const userinfoAddSchema = Joi.object<RequestData>({
 
 export const userinfoAddController: Controller<Context<RequestData>> = async (
   ctx,
-): ControllerResponse<Record<string, never>> => {
+): ControllerResponse => {
   const {
     data: {
       address,

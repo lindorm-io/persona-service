@@ -49,7 +49,7 @@ export const identifierRemoveSchema = Joi.object<RequestData>({
 
 export const identifierRemoveController: Controller<Context<RequestData>> = async (
   ctx,
-): ControllerResponse<Record<string, never>> => {
+): ControllerResponse => {
   const {
     data: { email, identifier, phoneNumber, type },
     entity: { identity },
