@@ -39,7 +39,14 @@ export interface OpenIDClaims {
   zoneInfo: string;
 }
 
-export interface IdentityServiceClaims {
+export interface IdentityServiceAddress extends OpenIDAddress {
+  careOf: string;
+}
+
+export interface IdentityServiceClaims extends OpenIDClaims {
+  // address
+  address: IdentityServiceAddress;
+
   // profile
   displayName: string;
   gravatar: string;
@@ -51,7 +58,4 @@ export interface IdentityServiceClaims {
   username: string;
 }
 
-export type ScopeHint = Record<
-  string,
-  Array<Partial<keyof OpenIDClaims | keyof IdentityServiceClaims>>
->;
+export type ScopeHint = Record<string, Array<Partial<keyof IdentityServiceClaims>>>;

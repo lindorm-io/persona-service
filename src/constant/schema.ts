@@ -20,6 +20,7 @@ export const JOI_IDENTIFIER_TYPE = Joi.string().valid(
 );
 
 export const JOI_IDENTITY_ADDRESS = Joi.object({
+  careOf: Joi.string().allow(null).required(),
   country: Joi.string().allow(null).required(),
   locality: Joi.string().allow(null).required(),
   postalCode: Joi.string().allow(null).required(),

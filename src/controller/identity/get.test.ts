@@ -51,6 +51,7 @@ describe("identityGetController", () => {
     await expect(identityGetController(ctx)).resolves.toStrictEqual({
       data: {
         address: {
+          careOf: "careOf",
           country: "country",
           locality: "locality",
           postalCode: "postalCode",

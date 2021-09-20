@@ -3,7 +3,7 @@ import request from "supertest";
 import { ConnectSession, Email } from "../../entity";
 import { EntityNotFoundError } from "@lindorm-io/entity";
 import { koa } from "../../server/koa";
-import { v4 as uuid } from "uuid";
+import { randomUUID } from "crypto";
 import {
   TEST_CONNECT_SESSION_CACHE,
   TEST_DISPLAY_NAME_REPOSITORY,
@@ -46,7 +46,7 @@ describe("/protected/identities", () => {
   test("GET /:id", async () => {
     const identity = await TEST_IDENTITY_REPOSITORY.create(
       getTestIdentity({
-        id: uuid(),
+        id: randomUUID(),
       }),
     );
     await TEST_EMAIL_REPOSITORY.create(
@@ -76,6 +76,7 @@ describe("/protected/identities", () => {
 
     expect(response.body).toStrictEqual({
       address: {
+        care_of: "careOf",
         country: "country",
         locality: "locality",
         postal_code: "postalCode",
@@ -120,7 +121,7 @@ describe("/protected/identities", () => {
   test("PUT /:id", async () => {
     const identity = await TEST_IDENTITY_REPOSITORY.create(
       getTestIdentity({
-        id: uuid(),
+        id: randomUUID(),
       }),
     );
 
@@ -170,7 +171,7 @@ describe("/protected/identities", () => {
   test("DELETE /:id", async () => {
     const identity = await TEST_IDENTITY_REPOSITORY.create(
       getTestIdentity({
-        id: uuid(),
+        id: randomUUID(),
         displayName: {
           name: "removeThisName",
           number: 9999,
@@ -208,7 +209,7 @@ describe("/protected/identities", () => {
   test("POST /:id/identifiers/:type", async () => {
     const identity = await TEST_IDENTITY_REPOSITORY.create(
       getTestIdentity({
-        id: uuid(),
+        id: randomUUID(),
       }),
     );
 
@@ -238,7 +239,7 @@ describe("/protected/identities", () => {
   test("DELETE /:id/identifiers/:type", async () => {
     const identity = await TEST_IDENTITY_REPOSITORY.create(
       getTestIdentity({
-        id: uuid(),
+        id: randomUUID(),
       }),
     );
 
@@ -270,7 +271,7 @@ describe("/protected/identities", () => {
   test("PUT /:id/identifiers/:type/set-primary", async () => {
     const identity = await TEST_IDENTITY_REPOSITORY.create(
       getTestIdentity({
-        id: uuid(),
+        id: randomUUID(),
       }),
     );
 

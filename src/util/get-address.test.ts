@@ -7,6 +7,7 @@ describe("getAddress", () => {
       getAddress(
         new Identity({
           address: {
+            careOf: "careOf",
             country: "country",
             locality: "locality",
             postalCode: "postalCode",
@@ -16,6 +17,7 @@ describe("getAddress", () => {
         }),
       ),
     ).toStrictEqual({
+      careOf: "careOf",
       country: "country",
       formatted: "street 1\nstreet 2\npostalCode locality\nregion\ncountry",
       locality: "locality",
@@ -30,6 +32,7 @@ describe("getAddress", () => {
       getAddress(
         new Identity({
           address: {
+            careOf: null,
             country: "country",
             locality: null,
             postalCode: "postalCode",
@@ -39,6 +42,7 @@ describe("getAddress", () => {
         }),
       ),
     ).toStrictEqual({
+      careOf: null,
       country: "country",
       formatted: "street 1\npostalCode\ncountry",
       locality: null,

@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { Context, IdentityServiceClaims, ScopeHint, OpenIDClaims } from "../../typing";
+import { Context, IdentityServiceClaims, ScopeHint } from "../../typing";
 import { Controller, ControllerResponse } from "@lindorm-io/koa";
 import { JOI_GUID, SCOPE_HINT } from "../../constant";
 import { TokenIssuer } from "@lindorm-io/jwt";
@@ -10,7 +10,7 @@ interface RequestData {
   id: string;
 }
 
-type ResponseData = OpenIDClaims & IdentityServiceClaims & { scopeHint: ScopeHint };
+type ResponseData = IdentityServiceClaims & { scopeHint: ScopeHint };
 
 export const userinfoGetSchema = Joi.object<RequestData>({
   id: JOI_GUID.required(),

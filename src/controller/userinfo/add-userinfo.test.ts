@@ -63,6 +63,7 @@ describe("userinfoAddController", () => {
     expect(ctx.repository.identityRepository.update).toHaveBeenCalledWith(
       expect.objectContaining({
         address: {
+          careOf: null,
           country: "country",
           locality: "locality",
           postalCode: "postalCode",

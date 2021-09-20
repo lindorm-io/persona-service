@@ -3,7 +3,7 @@ import request from "supertest";
 import { SCOPE_HINT } from "../../constant";
 import { baseHash } from "@lindorm-io/core";
 import { koa } from "../../server/koa";
-import { v4 as uuid } from "uuid";
+import { randomUUID } from "crypto";
 import {
   TEST_DISPLAY_NAME_REPOSITORY,
   TEST_EMAIL_REPOSITORY,
@@ -27,7 +27,7 @@ describe("/private/identities", () => {
 
   test("GET /:id/auth-methods", async () => {
     const identity = await TEST_IDENTITY_REPOSITORY.create(
-      getTestIdentity({ id: uuid() }),
+      getTestIdentity({ id: randomUUID() }),
     );
 
     await TEST_EMAIL_REPOSITORY.create(getTestEmail({ identityId: identity.id }));
@@ -58,7 +58,7 @@ describe("/private/identities", () => {
 
   test("GET /:id/userinfo", async () => {
     const identity = await TEST_IDENTITY_REPOSITORY.create(
-      getTestIdentity({ id: uuid() }),
+      getTestIdentity({ id: randomUUID() }),
     );
 
     await TEST_DISPLAY_NAME_REPOSITORY.create(getTestDisplayName());
@@ -74,6 +74,7 @@ describe("/private/identities", () => {
 
     expect(response.body).toStrictEqual({
       address: {
+        care_of: "careOf",
         country: "country",
         formatted: "streetAddress1\nstreetAddress2\npostalCode locality\nregion\ncountry",
         locality: "locality",
@@ -111,7 +112,7 @@ describe("/private/identities", () => {
   });
 
   test("PUT /:id/userinfo", async () => {
-    const identity = getTestIdentity({ id: uuid() });
+    const identity = getTestIdentity({ id: randomUUID() });
     identity.username = null;
 
     await TEST_IDENTITY_REPOSITORY.create(identity);
@@ -187,6 +188,7 @@ describe("/private/identities", () => {
     ).resolves.toStrictEqual(
       expect.objectContaining({
         address: {
+          careOf: null,
           country: "new_country",
           locality: "new_locality",
           postalCode: "new_postalCode",

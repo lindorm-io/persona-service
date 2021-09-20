@@ -122,6 +122,7 @@ export class Identity extends LindormEntity<IdentityAttributes> {
     super(options);
 
     this._address = {
+      careOf: options.address?.careOf || null,
       country: options.address?.country || null,
       locality: options.address?.locality || null,
       postalCode: options.address?.postalCode || null,

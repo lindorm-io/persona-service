@@ -90,6 +90,7 @@ export const userinfoAddController: Controller<Context<RequestData>> = async (
     shouldUserinfoReplace(identity, IdentityEvent.ADDRESS_CHANGED, updatedAt)
   ) {
     identity.address = {
+      careOf: null,
       country: address?.country,
       locality: address?.locality,
       postalCode: address?.postalCode,

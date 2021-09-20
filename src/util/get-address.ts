@@ -1,9 +1,9 @@
 import { Identity } from "../entity";
-import { OpenIDAddress } from "../typing";
+import { IdentityServiceAddress } from "../typing";
 
-export const getAddress = (identity: Identity): OpenIDAddress => {
+export const getAddress = (identity: Identity): IdentityServiceAddress => {
   const {
-    address: { country, locality, postalCode, region, streetAddress },
+    address: { careOf, country, locality, postalCode, region, streetAddress },
   } = identity.toJSON();
 
   const formatted: Array<string> = [];
@@ -31,6 +31,7 @@ export const getAddress = (identity: Identity): OpenIDAddress => {
   return {
     formatted: formatted.join("\n"),
     streetAddress: streetAddress?.join("\n"),
+    careOf,
     postalCode,
     locality,
     region,

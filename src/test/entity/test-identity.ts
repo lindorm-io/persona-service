@@ -5,6 +5,7 @@ export const getTestIdentity = (options: Partial<IdentityOptions> = {}): Identit
   new Identity({
     id: "2796b8bc-08ce-4aec-ac42-6d026c7c6938",
     address: {
+      careOf: "careOf",
       country: "country",
       locality: "locality",
       postalCode: "postalCode",
