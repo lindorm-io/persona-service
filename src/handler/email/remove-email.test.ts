@@ -20,7 +20,7 @@ describe("removeEmail", () => {
       repository: {
         emailRepository: {
           find: jest.fn().mockResolvedValue(email1),
-          remove: jest.fn(),
+          destroy: jest.fn(),
         },
       },
     };
@@ -33,7 +33,7 @@ describe("removeEmail", () => {
   test("should remove email", async () => {
     await expect(removeEmail(ctx, options)).resolves.toBeUndefined();
 
-    expect(ctx.repository.emailRepository.remove).toHaveBeenCalledWith(email1);
+    expect(ctx.repository.emailRepository.destroy).toHaveBeenCalledWith(email1);
   });
 
   test("should throw when email is primary", async () => {

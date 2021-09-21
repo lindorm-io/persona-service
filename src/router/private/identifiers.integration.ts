@@ -1,5 +1,6 @@
 import MockDate from "mockdate";
 import request from "supertest";
+import { Email, Identity, OpenIdIdentifier, PhoneNumber } from "../../entity";
 import { baseHash } from "@lindorm-io/core";
 import { koa } from "../../server/koa";
 import {
@@ -19,13 +20,31 @@ MockDate.set("2021-01-01T08:00:00.000Z");
 const basicAuth = baseHash("secret:secret");
 
 describe("/private/identifiers", () => {
+  let identity: Identity;
+  let email: Email;
+  let oidc: OpenIdIdentifier;
+  let phone: PhoneNumber;
+
   beforeAll(async () => {
     await setupIntegration();
 
-    await TEST_IDENTITY_REPOSITORY.create(getTestIdentity());
-    await TEST_EMAIL_REPOSITORY.create(getTestEmail());
-    await TEST_PHONE_NUMBER_REPOSITORY.create(getTestPhoneNumber());
-    await TEST_OPEN_ID_IDENTIFIER_REPOSITORY.create(getTestOpenIdIdentifier());
+    identity = await TEST_IDENTITY_REPOSITORY.create(getTestIdentity());
+
+    email = await TEST_EMAIL_REPOSITORY.create(
+      getTestEmail({
+        identityId: identity.id,
+      }),
+    );
+    oidc = await TEST_OPEN_ID_IDENTIFIER_REPOSITORY.create(
+      getTestOpenIdIdentifier({
+        identityId: identity.id,
+      }),
+    );
+    phone = await TEST_PHONE_NUMBER_REPOSITORY.create(
+      getTestPhoneNumber({
+        identityId: identity.id,
+      }),
+    );
   });
 
   test("POST /email/auth/verify", async () => {
@@ -33,12 +52,12 @@ describe("/private/identifiers", () => {
       .post("/private/identifiers/email/auth/verify")
       .set("Authorization", `Basic ${basicAuth}`)
       .send({
-        email: "test@lindorm.io",
+        email: email.email,
       })
       .expect(200);
 
     expect(response.body).toStrictEqual({
-      identity_id: "2796b8bc-08ce-4aec-ac42-6d026c7c6938",
+      identity_id: identity.id,
     });
   });
 
@@ -47,12 +66,12 @@ describe("/private/identifiers", () => {
       .post("/private/identifiers/phone_number/auth/verify")
       .set("Authorization", `Basic ${basicAuth}`)
       .send({
-        phone_number: "+46701234567",
+        phone_number: phone.phoneNumber,
       })
       .expect(200);
 
     expect(response.body).toStrictEqual({
-      identity_id: "2796b8bc-08ce-4aec-ac42-6d026c7c6938",
+      identity_id: identity.id,
     });
   });
 
@@ -61,13 +80,13 @@ describe("/private/identifiers", () => {
       .post("/private/identifiers/oidc/auth/verify")
       .set("Authorization", `Basic ${basicAuth}`)
       .send({
-        identifier: "6f705339272d4ba3b4392ab628b000f3",
-        provider: "https://apple.com/",
+        identifier: oidc.identifier,
+        provider: "https://login.apple.com/",
       })
       .expect(200);
 
     expect(response.body).toStrictEqual({
-      identity_id: "2796b8bc-08ce-4aec-ac42-6d026c7c6938",
+      identity_id: identity.id,
     });
   });
 
@@ -76,12 +95,12 @@ describe("/private/identifiers", () => {
       .post("/private/identifiers/username/auth/verify")
       .set("Authorization", `Basic ${basicAuth}`)
       .send({
-        username: "username",
+        username: identity.username,
       })
       .expect(200);
 
     expect(response.body).toStrictEqual({
-      identity_id: "2796b8bc-08ce-4aec-ac42-6d026c7c6938",
+      identity_id: identity.id,
     });
   });
 });

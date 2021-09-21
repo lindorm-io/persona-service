@@ -49,11 +49,11 @@ export const connectPhoneNumberInitialise = async (
   }
 
   const expiresIn = stringToSeconds(config.EXPIRY_CONNECT_IDENTIFIER_SESSION);
-  const code = await getRandomNumber(6);
+  const code = (await getRandomNumber(6)).toString().padStart(6, "0");
 
   const session = await connectSessionCache.create(
     new ConnectSession({
-      code: await cryptoLayered.encrypt(code.toString()),
+      code: await cryptoLayered.encrypt(code),
       identifier: entity.phoneNumber,
       type: IdentifierType.PHONE_NUMBER,
     }),

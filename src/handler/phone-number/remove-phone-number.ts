@@ -22,5 +22,5 @@ export const removePhoneNumber = async (
     throw new ClientError("Unable to remove primary phoneNumber");
   }
 
-  await phoneNumberRepository.remove(entity);
+  await phoneNumberRepository.destroy(entity);
 };

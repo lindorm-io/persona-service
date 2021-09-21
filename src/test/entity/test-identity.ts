@@ -1,9 +1,9 @@
 import { Identity, IdentityOptions } from "../../entity";
 import { NamingSystem } from "../../enum";
+import { getRandomNumber, getRandomString } from "@lindorm-io/core";
 
 export const getTestIdentity = (options: Partial<IdentityOptions> = {}): Identity =>
   new Identity({
-    id: "2796b8bc-08ce-4aec-ac42-6d026c7c6938",
     address: {
       careOf: "careOf",
       country: "country",
@@ -14,8 +14,8 @@ export const getTestIdentity = (options: Partial<IdentityOptions> = {}): Identit
     },
     birthDate: "2000-01-01",
     displayName: {
-      name: "displayName",
-      number: 1234,
+      name: null,
+      number: null,
     },
     familyName: "familyName",
     gender: "gender",
@@ -30,8 +30,8 @@ export const getTestIdentity = (options: Partial<IdentityOptions> = {}): Identit
     preferredUsername: "username",
     profile: "https://profile.url/",
     pronouns: "she/her",
-    socialSecurityNumber: "198412301545",
-    username: "username",
+    socialSecurityNumber: getRandomNumber(12).toString(),
+    username: getRandomString(16),
     website: "https://website.url/",
     zoneInfo: "Europe/Stockholm",
     ...options,

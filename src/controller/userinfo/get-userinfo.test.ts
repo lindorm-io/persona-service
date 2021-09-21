@@ -28,6 +28,8 @@ describe("userinfoGetController", () => {
         identity: getTestIdentity({
           id: "id",
           updated: new Date("2021-01-01T08:00:00.000Z"),
+          socialSecurityNumber: "198412301545",
+          username: "username",
         }),
       },
       logger,

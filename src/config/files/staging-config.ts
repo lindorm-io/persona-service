@@ -27,12 +27,13 @@ export const stagingConfig: Configuration = {
   // Redis
   REDIS_HOST: null,
   REDIS_PORT: null,
+  REDIS_USERNAME: null,
   REDIS_PASSWORD: null,
 
   // Mongo
   MONGO_HOST: null,
   MONGO_PORT: null,
-  MONGO_DB_NAME: "authorization",
+  MONGO_DB_NAME: "identity",
   MONGO_USERNAME: null,
   MONGO_PASSWORD: null,
 };

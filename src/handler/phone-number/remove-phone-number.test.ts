@@ -20,7 +20,7 @@ describe("removePhoneNumber", () => {
       repository: {
         phoneNumberRepository: {
           find: jest.fn().mockResolvedValue(phone1),
-          remove: jest.fn(),
+          destroy: jest.fn(),
         },
       },
     };
@@ -33,7 +33,7 @@ describe("removePhoneNumber", () => {
   test("should remove phone number", async () => {
     await expect(removePhoneNumber(ctx, options)).resolves.toBeUndefined();
 
-    expect(ctx.repository.phoneNumberRepository.remove).toHaveBeenCalledWith(phone1);
+    expect(ctx.repository.phoneNumberRepository.destroy).toHaveBeenCalledWith(phone1);
   });
 
   test("should throw when phone is primary", async () => {

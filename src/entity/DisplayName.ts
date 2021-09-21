@@ -59,7 +59,7 @@ export class DisplayName extends LindormEntity<DisplayNameAttributes> {
     let currentTry = 0;
 
     while (currentTry < maximumTries) {
-      const number = await getRandomNumber(4);
+      const number = getRandomNumber(4);
 
       if (!this.exists(number)) {
         return number;

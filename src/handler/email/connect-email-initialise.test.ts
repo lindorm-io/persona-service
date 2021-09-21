@@ -65,7 +65,7 @@ describe("connectEmailInitialise", () => {
       "/private/send/email",
       {
         data: {
-          code: expect.any(Number),
+          code: expect.any(String),
           email: "email1",
           expiresIn: 7200,
           name: "givenName familyName",
@@ -97,7 +97,7 @@ describe("connectEmailInitialise", () => {
       "/private/send/email",
       {
         data: {
-          code: expect.any(Number),
+          code: expect.any(String),
           email: "email",
           expiresIn: 7200,
           name: "givenName familyName",

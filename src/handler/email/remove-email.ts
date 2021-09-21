@@ -19,5 +19,5 @@ export const removeEmail = async (ctx: Context, options: Options): Promise<void>
     throw new ClientError("Unable to remove primary email");
   }
 
-  await emailRepository.remove(entity);
+  await emailRepository.destroy(entity);
 };

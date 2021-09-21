@@ -49,18 +49,18 @@ describe("/protected/identities", () => {
         id: randomUUID(),
       }),
     );
-    await TEST_EMAIL_REPOSITORY.create(
+    const email = await TEST_EMAIL_REPOSITORY.create(
       getTestEmail({
         identityId: identity.id,
       }),
     );
-    await TEST_PHONE_NUMBER_REPOSITORY.create(
-      getTestPhoneNumber({
+    const oidc = await TEST_OPEN_ID_IDENTIFIER_REPOSITORY.create(
+      getTestOpenIdIdentifier({
         identityId: identity.id,
       }),
     );
-    await TEST_OPEN_ID_IDENTIFIER_REPOSITORY.create(
-      getTestOpenIdIdentifier({
+    const phone = await TEST_PHONE_NUMBER_REPOSITORY.create(
+      getTestPhoneNumber({
         identityId: identity.id,
       }),
     );
@@ -84,11 +84,11 @@ describe("/protected/identities", () => {
         street_address: ["streetAddress1", "streetAddress2"],
       },
       birth_date: "2000-01-01",
-      connected_providers: ["https://apple.com/"],
-      display_name: "displayName#1234",
+      connected_providers: [oidc.provider],
+      display_name: null,
       emails: [
         {
-          email: "test@lindorm.io",
+          email: email.email,
           primary: true,
           verified: true,
         },
@@ -102,7 +102,7 @@ describe("/protected/identities", () => {
       nickname: "nickname",
       phone_numbers: [
         {
-          phoneNumber: "+46701234567",
+          phoneNumber: phone.phoneNumber,
           primary: true,
           verified: true,
         },
@@ -111,8 +111,8 @@ describe("/protected/identities", () => {
       preferred_username: "username",
       profile: "https://profile.url/",
       pronouns: "she/her",
-      social_security_number: "198412301545",
-      username: "username",
+      social_security_number: identity.socialSecurityNumber,
+      username: identity.username,
       website: "https://website.url/",
       zone_info: "Europe/Stockholm",
     });
@@ -231,7 +231,7 @@ describe("/protected/identities", () => {
       TEST_EMAIL_REPOSITORY.find({ email: "new-identity-email@lindorm.io" }),
     ).resolves.toStrictEqual(expect.any(Email));
 
-    await expect(TEST_CONNECT_SESSION_CACHE.findAll()).resolves.toStrictEqual(
+    await expect(TEST_CONNECT_SESSION_CACHE.findMany({})).resolves.toStrictEqual(
       expect.arrayContaining([expect.any(ConnectSession)]),
     );
   });

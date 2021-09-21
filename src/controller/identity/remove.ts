@@ -29,10 +29,10 @@ export const identityRemoveController: Controller<Context<RequestData>> = async 
     await removeIdentityDisplayName(ctx, identity);
   }
 
-  await emailRepository.removeMany({ identityId: identity.id });
-  await openIdIdentifierRepository.removeMany({ identityId: identity.id });
-  await phoneNumberRepository.removeMany({ identityId: identity.id });
-  await identityRepository.remove(identity);
+  await emailRepository.destroyMany({ identityId: identity.id });
+  await openIdIdentifierRepository.destroyMany({ identityId: identity.id });
+  await phoneNumberRepository.destroyMany({ identityId: identity.id });
+  await identityRepository.destroy(identity);
 
   return {
     data: {},

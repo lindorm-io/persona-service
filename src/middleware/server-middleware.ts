@@ -1,8 +1,7 @@
-import { MongoConnectionType } from "@lindorm-io/mongo";
-import { RedisConnectionType } from "@lindorm-io/redis";
 import { axiosMiddleware } from "@lindorm-io/koa-axios";
 import { cacheMiddleware, redisMiddleware } from "@lindorm-io/koa-redis";
-import { inMemoryCache, inMemoryStore } from "../test";
+import { config } from "../config";
+import { mongoConnection, redisConnection } from "../instance";
 import { mongoMiddleware, repositoryMiddleware } from "@lindorm-io/koa-mongo";
 import { tokenIssuerMiddleware } from "@lindorm-io/koa-jwt";
 import {
@@ -10,12 +9,6 @@ import {
   cacheKeysMiddleware,
   keystoreMiddleware,
 } from "@lindorm-io/koa-keystore";
-import {
-  IS_TEST,
-  MONGO_CONNECTION_OPTIONS,
-  REDIS_CONNECTION_OPTIONS,
-  config,
-} from "../config";
 import {
   ConnectSessionCache,
   DisplayNameRepository,
@@ -42,11 +35,7 @@ export const serverMiddlewares = [
 
   // Repository
 
-  mongoMiddleware({
-    ...MONGO_CONNECTION_OPTIONS,
-    type: IS_TEST ? MongoConnectionType.MEMORY : MONGO_CONNECTION_OPTIONS.type,
-    inMemoryStore: IS_TEST ? inMemoryStore : undefined,
-  }),
+  mongoMiddleware(mongoConnection),
   repositoryMiddleware(DisplayNameRepository),
   repositoryMiddleware(EmailRepository),
   repositoryMiddleware(IdentityRepository),
@@ -55,11 +44,7 @@ export const serverMiddlewares = [
 
   // Cache
 
-  redisMiddleware({
-    ...REDIS_CONNECTION_OPTIONS,
-    type: IS_TEST ? RedisConnectionType.MEMORY : REDIS_CONNECTION_OPTIONS.type,
-    inMemoryCache: IS_TEST ? inMemoryCache : undefined,
-  }),
+  redisMiddleware(redisConnection),
   cacheMiddleware(ConnectSessionCache),
   cacheMiddleware(KeyPairCache),
 

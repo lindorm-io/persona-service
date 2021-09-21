@@ -9,6 +9,7 @@ export class ConnectSessionCache extends LindormCache<
     super({
       ...options,
       entityName: "ConnectSession",
+      indexedAttributes: [],
     });
   }
 

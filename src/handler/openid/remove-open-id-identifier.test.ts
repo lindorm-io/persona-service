@@ -18,7 +18,7 @@ describe("removeOpenIdIdentifier", () => {
       repository: {
         openIdIdentifierRepository: {
           find: jest.fn().mockResolvedValue(identifier1),
-          remove: jest.fn(),
+          destroy: jest.fn(),
         },
       },
     };
@@ -31,7 +31,7 @@ describe("removeOpenIdIdentifier", () => {
   test("should find and remove identifier", async () => {
     await expect(removeOpenIdIdentifier(ctx, options)).resolves.toBeUndefined();
 
-    expect(ctx.repository.openIdIdentifierRepository.remove).toHaveBeenCalledWith(
+    expect(ctx.repository.openIdIdentifierRepository.destroy).toHaveBeenCalledWith(
       identifier1,
     );
   });

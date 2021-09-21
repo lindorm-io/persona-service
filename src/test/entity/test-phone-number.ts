@@ -1,11 +1,13 @@
 import { PhoneNumber, PhoneNumberOptions } from "../../entity";
+import { randomUUID } from "crypto";
+import { getRandomNumber } from "@lindorm-io/core";
 
 export const getTestPhoneNumber = (
   options: Partial<PhoneNumberOptions> = {},
 ): PhoneNumber =>
   new PhoneNumber({
-    identityId: "2796b8bc-08ce-4aec-ac42-6d026c7c6938",
-    phoneNumber: "+46701234567",
+    identityId: randomUUID(),
+    phoneNumber: `+4670${getRandomNumber(7)}`,
     primary: true,
     verified: true,
     ...options,

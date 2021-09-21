@@ -63,7 +63,7 @@ describe("connectPhoneNumberInitialise", () => {
 
     expect(ctx.axios.communicationClient.post).toHaveBeenCalledWith("/private/send/sms", {
       data: {
-        code: expect.any(Number),
+        code: expect.any(String),
         expiresIn: 7200,
         name: "givenName familyName",
         phoneNumber: "phoneNumber1",
@@ -92,7 +92,7 @@ describe("connectPhoneNumberInitialise", () => {
 
     expect(ctx.axios.communicationClient.post).toHaveBeenCalledWith("/private/send/sms", {
       data: {
-        code: expect.any(Number),
+        code: expect.any(String),
         expiresIn: 7200,
         name: "givenName familyName",
         phoneNumber: "phoneNumber",

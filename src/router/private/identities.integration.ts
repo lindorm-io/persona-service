@@ -1,9 +1,8 @@
 import MockDate from "mockdate";
 import request from "supertest";
 import { SCOPE_HINT } from "../../constant";
-import { baseHash } from "@lindorm-io/core";
+import { baseHash, getRandomNumber, getRandomString } from "@lindorm-io/core";
 import { koa } from "../../server/koa";
-import { randomUUID } from "crypto";
 import {
   TEST_DISPLAY_NAME_REPOSITORY,
   TEST_EMAIL_REPOSITORY,
@@ -26,22 +25,22 @@ describe("/private/identities", () => {
   beforeAll(setupIntegration);
 
   test("GET /:id/auth-methods", async () => {
-    const identity = await TEST_IDENTITY_REPOSITORY.create(
-      getTestIdentity({ id: randomUUID() }),
-    );
+    const identity = await TEST_IDENTITY_REPOSITORY.create(getTestIdentity());
 
-    await TEST_EMAIL_REPOSITORY.create(getTestEmail({ identityId: identity.id }));
-    await TEST_PHONE_NUMBER_REPOSITORY.create(
-      getTestPhoneNumber({ identityId: identity.id }),
+    const email = await TEST_EMAIL_REPOSITORY.create(
+      getTestEmail({ identityId: identity.id }),
     );
-    await TEST_OPEN_ID_IDENTIFIER_REPOSITORY.create(
+    const oidc1 = await TEST_OPEN_ID_IDENTIFIER_REPOSITORY.create(
       getTestOpenIdIdentifier({ identityId: identity.id }),
     );
-    await TEST_OPEN_ID_IDENTIFIER_REPOSITORY.create(
+    const oidc2 = await TEST_OPEN_ID_IDENTIFIER_REPOSITORY.create(
       getTestOpenIdIdentifier({
         identityId: identity.id,
-        provider: "https://google.com/",
+        provider: "https://auth.google.com/",
       }),
+    );
+    const phone = await TEST_PHONE_NUMBER_REPOSITORY.create(
+      getTestPhoneNumber({ identityId: identity.id }),
     );
 
     const response = await request(koa.callback())
@@ -50,21 +49,33 @@ describe("/private/identities", () => {
       .expect(200);
 
     expect(response.body).toStrictEqual({
-      connected_open_id_providers: ["https://apple.com/", "https://google.com/"],
-      email: "test@lindorm.io",
-      phone_number: "+46701234567",
+      connected_open_id_providers: [oidc1.provider, oidc2.provider],
+      email: email.email,
+      phone_number: phone.phoneNumber,
     });
   });
 
   test("GET /:id/userinfo", async () => {
     const identity = await TEST_IDENTITY_REPOSITORY.create(
-      getTestIdentity({ id: randomUUID() }),
+      getTestIdentity({
+        displayName: {
+          name: getRandomString(12),
+          number: getRandomNumber(4),
+        },
+      }),
     );
 
-    await TEST_DISPLAY_NAME_REPOSITORY.create(getTestDisplayName());
-    await TEST_EMAIL_REPOSITORY.create(getTestEmail({ identityId: identity.id }));
-    await TEST_PHONE_NUMBER_REPOSITORY.create(
+    const email = await TEST_EMAIL_REPOSITORY.create(
+      getTestEmail({ identityId: identity.id }),
+    );
+    const phone = await TEST_PHONE_NUMBER_REPOSITORY.create(
       getTestPhoneNumber({ identityId: identity.id }),
+    );
+    await TEST_DISPLAY_NAME_REPOSITORY.create(
+      getTestDisplayName({
+        name: identity.displayName.name,
+        numbers: [identity.displayName.number],
+      }),
     );
 
     const response = await request(koa.callback())
@@ -83,8 +94,8 @@ describe("/private/identities", () => {
         street_address: "streetAddress1\nstreetAddress2",
       },
       birth_date: "2000-01-01",
-      display_name: "displayName#1234",
-      email: "test@lindorm.io",
+      display_name: `${identity.displayName.name}#${identity.displayName.number}`,
+      email: email.email,
       email_verified: true,
       family_name: "familyName",
       gender: "gender",
@@ -94,7 +105,7 @@ describe("/private/identities", () => {
       middle_name: "middleName",
       name: "givenName familyName",
       nickname: "nickname",
-      phone_number: "+46701234567",
+      phone_number: phone.phoneNumber,
       phone_number_verified: true,
       picture: "https://picture.url/",
       preferred_accessibility: ["setting1", "setting2", "setting3"],
@@ -102,18 +113,22 @@ describe("/private/identities", () => {
       profile: "https://profile.url/",
       pronouns: "she/her",
       scope_hint: SCOPE_HINT,
-      social_security_number: "198412301545",
+      social_security_number: identity.socialSecurityNumber,
       sub: identity.id,
       updated_at: 1609488000,
-      username: "username",
+      username: identity.username,
       website: "https://website.url/",
       zone_info: "Europe/Stockholm",
     });
   });
 
   test("PUT /:id/userinfo", async () => {
-    const identity = getTestIdentity({ id: randomUUID() });
+    const identity = getTestIdentity();
     identity.username = null;
+
+    const email = `new-${getRandomString(16)}@lindorm.io`;
+    const phone = `+${getRandomNumber(12)}`;
+    const sub = getRandomString(32);
 
     await TEST_IDENTITY_REPOSITORY.create(identity);
 
@@ -121,8 +136,8 @@ describe("/private/identities", () => {
       .put(`/private/identities/${identity.id}/userinfo`)
       .set("Authorization", `Basic ${basicAuth}`)
       .send({
-        provider: "https://google.com/",
-        sub: "b2f8c2e66cbc4875a39043ebb9dce576",
+        provider: "https://github.com/",
+        sub,
         updated_at: 1609489000,
 
         address: {
@@ -133,7 +148,7 @@ describe("/private/identities", () => {
           street_address: "new_streetAddress1\nnew_streetAddress2",
         },
         birth_date: "2010-01-01",
-        email: "new.test@lindorm.io",
+        email,
         email_verified: true,
         family_name: "new_familyName",
         gender: "new_gender",
@@ -141,7 +156,7 @@ describe("/private/identities", () => {
         locale: "en-GB",
         middle_name: "new_middleName",
         nickname: "new_nickname",
-        phone_number: "+42701234567",
+        phone_number: phone,
         phone_number_verified: true,
         picture: "https://picture.url/new/",
         preferred_username: "new_username",
@@ -155,7 +170,7 @@ describe("/private/identities", () => {
       TEST_EMAIL_REPOSITORY.find({ identityId: identity.id }),
     ).resolves.toStrictEqual(
       expect.objectContaining({
-        email: "new.test@lindorm.io",
+        email: email,
         identityId: identity.id,
         primary: true,
         verified: false,
@@ -166,7 +181,7 @@ describe("/private/identities", () => {
       TEST_PHONE_NUMBER_REPOSITORY.find({ identityId: identity.id }),
     ).resolves.toStrictEqual(
       expect.objectContaining({
-        phoneNumber: "+42701234567",
+        phoneNumber: phone,
         identityId: identity.id,
         primary: true,
         verified: false,
@@ -177,9 +192,9 @@ describe("/private/identities", () => {
       TEST_OPEN_ID_IDENTIFIER_REPOSITORY.find({ identityId: identity.id }),
     ).resolves.toStrictEqual(
       expect.objectContaining({
-        identifier: "b2f8c2e66cbc4875a39043ebb9dce576",
+        identifier: sub,
         identityId: identity.id,
-        provider: "https://google.com/",
+        provider: "https://github.com/",
       }),
     );
 

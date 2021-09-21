@@ -17,5 +17,5 @@ export const removeOpenIdIdentifier = async (
 
   const entity = await openIdIdentifierRepository.find({ identityId, identifier });
 
-  await openIdIdentifierRepository.remove(entity);
+  await openIdIdentifierRepository.destroy(entity);
 };

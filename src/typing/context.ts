@@ -34,7 +34,7 @@ export interface Context<
     connectSessionCache: ConnectSessionCache;
     keyPairCache: KeyPairCache;
   };
-  client: {
+  connection: {
     mongo: MongoConnection;
     redis: RedisConnection;
   };

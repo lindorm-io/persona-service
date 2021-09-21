@@ -17,6 +17,8 @@ describe("identityGetController", () => {
       entity: {
         identity: getTestIdentity({
           id: "identityId",
+          socialSecurityNumber: "198412301545",
+          username: "username",
         }),
       },
       logger,

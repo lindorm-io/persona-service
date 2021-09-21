@@ -16,21 +16,25 @@ describe("identityRemoveController", () => {
       entity: {
         identity: getTestIdentity({
           id: "identityId",
+          displayName: {
+            name: "name",
+            number: 1234,
+          },
         }),
       },
       logger,
       repository: {
         emailRepository: {
-          removeMany: jest.fn(),
+          destroyMany: jest.fn(),
         },
         identityRepository: {
-          remove: jest.fn(),
+          destroy: jest.fn(),
         },
         openIdIdentifierRepository: {
-          removeMany: jest.fn(),
+          destroyMany: jest.fn(),
         },
         phoneNumberRepository: {
-          removeMany: jest.fn(),
+          destroyMany: jest.fn(),
         },
       },
       token: {
@@ -47,9 +51,9 @@ describe("identityRemoveController", () => {
     });
 
     expect(removeIdentityDisplayName).toHaveBeenCalled();
-    expect(ctx.repository.emailRepository.removeMany).toHaveBeenCalled();
-    expect(ctx.repository.openIdIdentifierRepository.removeMany).toHaveBeenCalled();
-    expect(ctx.repository.phoneNumberRepository.removeMany).toHaveBeenCalled();
-    expect(ctx.repository.identityRepository.remove).toHaveBeenCalled();
+    expect(ctx.repository.emailRepository.destroyMany).toHaveBeenCalled();
+    expect(ctx.repository.openIdIdentifierRepository.destroyMany).toHaveBeenCalled();
+    expect(ctx.repository.phoneNumberRepository.destroyMany).toHaveBeenCalled();
+    expect(ctx.repository.identityRepository.destroy).toHaveBeenCalled();
   });
 });
